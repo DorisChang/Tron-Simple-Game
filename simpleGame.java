@@ -1,5 +1,7 @@
 //Game3.java
 
+//HOT DIGGITY DOG!
+
 //import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
