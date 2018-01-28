@@ -9,58 +9,36 @@ public class Spot{
 	//private ArrayList<int> path = new ArrayList<int>();
 	private int cx, cy; //current value;
 	private int xChange, yChange;
-	private Boolean hit = false;
+	private Boolean hit,pressTurbo;
 
 	public Spot(int x, int y){
 		cx = x;
 		cy = y;
+
+		hit = false;
+		pressTurbo = false;
 	}
 
 	public boolean hitBorder(){
-		if(xChange < 0){ //moving LEFT
-			System.out.println("L");
-			//System.out.println(cx);
-			//System.out.println(cy);
-			if(cx <= 0){
-				hit = true;
-				return true;
-			}
+		System.out.println("XCHANGE: "+xChange);
+		System.out.println("YCHANGE: "+yChange);
+
+		if(cx <= 50 || cx >= 840){
+			noMove();
+			hit = true;
+			return true;
 		}
 
-		if(xChange > 0){ //moving RIGHT
-			System.out.println("R");
-			//System.out.println(cx);
-			//System.out.println(cy);
-			if(cx + 10 >= 900){
-				hit = true;
-				return true;
-			}
+		else if(cy <= 210 || cy >= 720){
+			noMove();
+			hit = true;
+			return true;
 		}
 
-		if(yChange < 0){ //moving UP
-			System.out.println("U");
-			//System.out.println(cx);
-			//System.out.println(cy);
-			if(cy <= 0){
-				hit = true;
-				return true;
-			}
-		}
-
-		if(yChange > 0){ //moving DOWN
-			System.out.println("D");
-			//System.out.println(cx);
-			System.out.println("CY:"+cy);
-			if(cy + 10 >= 500){
-				hit = true;
-				return true;
-			}
-		}
-
-		//else{
+		else{
 			hit = false;
 			return false;
-		//}
+		}
 	}
 
 	public int getX(){
@@ -71,20 +49,38 @@ public class Spot{
 		return cy;
 	}
 
+	public void noMove(){
+		xChange = 0;
+		yChange = 0;
+	}
+
+	public boolean getHit(){
+		return hit;
+	}
+
+	public void hitObject(){
+		hit = true;
+	}
+
 	public void move(){
+		hitBorder();
 		cx += xChange;
 		cy += yChange;
 
-		//System.out.println(cx);
-		System.out.println(cy);
-
-		if(hitBorder() == true){
-			xChange = 0;
-			yChange = 0;
+		if(pressTurbo == true){
+			xChange /= 5;
+			yChange /= 5;
+			pressTurbo = false;
 		}
 
-		//System.out.println(hit);
-		//System.out.println(hitBorder());
+
+		System.out.println(cx);
+	}
+
+	public void turbo(){
+		pressTurbo = true;
+		xChange *= 5;
+		yChange *= 5;
 	}
 
 	public void moveRight(){
