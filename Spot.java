@@ -10,18 +10,27 @@ public class Spot{
 	private int cx, cy; //current value;
 	private int xChange, yChange;
 	private Boolean hit,pressTurbo;
-
+	
+	
 	public Spot(int x, int y){
 		cx = x;
 		cy = y;
-
+		
 		hit = false;
 		pressTurbo = false;
 	}
-
+	
+	public Point returnPos(){
+		return(new Point(cx,cy));
+		}
+	
+	public Point returnNextPos(){
+		return(new Point(cx+xChange,cy+yChange));
+		}
+		
 	public boolean hitBorder(){
-		System.out.println("XCHANGE: "+xChange);
-		System.out.println("YCHANGE: "+yChange);
+		//System.out.println("XCHANGE: "+xChange);
+		//System.out.println("YCHANGE: "+yChange);
 
 		if(cx <= 50 || cx >= 840){
 			noMove();
@@ -74,7 +83,7 @@ public class Spot{
 		}
 
 
-		System.out.println(cx);
+		//System.out.println(cx);
 	}
 
 	public void turbo(){
