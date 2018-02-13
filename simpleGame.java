@@ -1,7 +1,9 @@
 //Game3.java
 
 //HOT DIGGITY DOG!
-
+import java.util.ArrayList;
+import java.awt.image.*;
+import java.lang.Math;
 import java.util.Random;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,7 +20,7 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 	public simpleGame(){
 		super("Tron"); //calls constructor of super frame, must be first line of constructor
 		setSize(850,800);
-		myTimer = new Timer(35,this);
+		myTimer = new Timer(50,this);
 		myTimer.start();
 		game = new GamePanel();
 		add(game);
@@ -36,6 +38,7 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 	public void actionPerformed(ActionEvent e){
 		if(game != null){
 			game.twoPlayer();
+			
 			//game.onePlayer();
 
 			//if sp >> only 1 P
@@ -59,6 +62,11 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private boolean [] keys;
 	private Spot box1;
 	private Spot box2;
+	
+	private Boolean newRound = false;
+	private static ArrayList<Point>pOnePath = new ArrayList<Point>();
+	private static ArrayList<Point>pTwoPath = new ArrayList<Point>();
+	
 	private int turbo1, turbo2;
 	private int lifeTime = 100;
 	private int newObject = 200;
@@ -75,7 +83,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	//private ArrayList<Trail>path = new ArrayList<Trail>();
 
 	public GamePanel(){
-		nextRound();
+		newRound();
 
 		p1_Points = 0;
 		p2_Points = 0;
@@ -98,7 +106,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 	@Override //think I am overriding one of the methods in JPanel
 	public void paintComponent(Graphics g){ //supply same parameters that replaces it
-		g.setColor(new Color(0,0,0));
+		/*g.setColor(new Color(0,0,0));
 		g.fillRect(0,0,getWidth(),getHeight());
 
 		g.setColor(new Color(125,125,125));
@@ -112,8 +120,31 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		g.fillRect(325,700,200,25);
 
 		g.drawImage(p1,box1.getX(),box1.getY(),this);
-		g.drawImage(p2,box2.getX(),box2.getY(),this);
+		g.drawImage(p2,box2.getX(),box2.getY(),this);*/
+		
+		g.setColor(new Color(222,255,222));
+		//g.fillRect(0,0,getWidth(),getHeight());
 
+		g.setColor(new Color(125,125,125));
+		if(newRound){
+			g.fillRect(50,210,800,520);	
+			newRound = false;
+			}
+		
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(50,40,125,125);
+		g.fillRect(725,40,125,125);
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(0,0,5,50);
+
+		g.setColor(Color.blue);
+		g.fillRect(box1.getX(),box1.getY(),10,10);
+
+		g.setColor(Color.red);
+		g.fillRect(box2.getX(),box2.getY(),10,10);
+		
 		//int px = 0, py = 0;
 		int r = 0, v = 0, b = 0;
 
@@ -128,9 +159,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 				r = rand.nextInt(255);
 				v = rand.nextInt(255);
 				b = rand.nextInt(255);
-
 				//p = new Rectangle(px+50,py+210,10,10);
-
 				blitted = false;
 			}
 
@@ -138,7 +167,77 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			g.fillRect(px+50,py+210,30,30);
 		}
 	}
-
+	public boolean oHitT(){ //player one hit player two's path, or it's own path
+		
+		if(pTwoPath.contains(box1.returnNextPos())){ //hit the other player's path
+			return true;
+			}
+		if(pOnePath.contains(box1.returnNextPos())){
+			return true;
+			}
+		
+		/*for(int i=0;i<box1.returnNextPos().x-box1.returnPos().x;i++){
+			pOnePath.add()
+			}*/
+		if(box1.returnNextPos().x-box1.returnPos().x>0){ //moving right
+			for(int i=0; i<box1.returnNextPos().x-box1.returnPos().x; i++){
+				pOnePath.add(new Point(box1.returnPos().x+i,box1.returnPos().y));
+				}
+			}
+		else{ //moving left
+			for(int i=0; i<Math.abs(box1.returnNextPos().x-box1.returnPos().x); i++){
+				pOnePath.add(new Point(box1.returnPos().x-i,box1.returnPos().y));
+				}
+			}
+		if(box1.returnNextPos().y-box1.returnPos().y>0){ //moving down
+			for(int i=0; i<box1.returnNextPos().y-box1.returnPos().y; i++){
+				pOnePath.add(new Point(box1.returnPos().x,box1.returnPos().y+i));
+				}
+			}
+		else{ //moving up
+			for(int i=0; i<Math.abs(box1.returnNextPos().y-box1.returnPos().y); i++){
+				pOnePath.add(new Point(box1.returnPos().x,box1.returnPos().y-i));
+				}
+			}
+			
+		//pOnePath.add(box1.returnNextPos()); //doesn't hit the other player's path
+		return false;
+		}
+	
+	public boolean tHitO(){ //player two hit player one's path, or it's own path
+		
+		if(pOnePath.contains(box2.returnNextPos())){
+			return true;
+			}
+			
+		if(pTwoPath.contains(box2.returnNextPos())){
+			return true;
+			}
+			
+		//pTwoPath.add(box2.returnNextPos());
+		if(box2.returnNextPos().x-box2.returnPos().x>0){ //moving right
+			for(int i=0; i<box2.returnNextPos().x-box2.returnPos().x; i++){
+				pTwoPath.add(new Point(box2.returnPos().x+i,box2.returnPos().y));
+				}
+			}
+		else{ //moving left
+			for(int i=0; i<Math.abs(box2.returnNextPos().x-box2.returnPos().x); i++){
+				pTwoPath.add(new Point(box2.returnPos().x-i,box2.returnPos().y));
+				}
+			}
+		if(box2.returnNextPos().y-box2.returnPos().y>0){ //moving down
+			for(int i=0; i<box2.returnNextPos().y-box2.returnPos().y; i++){
+				pTwoPath.add(new Point(box2.returnPos().x,box2.returnPos().y+i));
+				}
+			}
+		else{ //moving up
+			for(int i=0; i<Math.abs(box2.returnNextPos().y-box2.returnPos().y); i++){
+				pTwoPath.add(new Point(box2.returnPos().x,box2.returnPos().y-i));
+				}
+			}	
+		return false;
+		}
+		
 	//ALL THREE MUST BE PRESENT
 	public void keyPressed(KeyEvent e){
 		keys[e.getKeyCode()] = true;
@@ -149,7 +248,27 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	}
 
 	public void keyTyped(KeyEvent e){} //don't use this for games
-
+	
+	/*public void moving(){
+		System.out.println(pOnePath.size());
+		System.out.println(pTwoPath.size());
+		
+		if(oHitT()){
+			System.out.println("Player one lost");
+			newRound();
+			}
+		else{
+			box1.move();
+			}
+		if(tHitO()){
+			System.out.println("Player two lost");
+			newRound();
+			}
+		else{
+			box2.move();
+			}	
+		}*/	
+	
 	public void onePlayer(){
 		pMove();
 		cMove();
@@ -159,15 +278,34 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	}
 
 	public void twoPlayer(){
-		int p1wins = 0;
-		int p2wins = 0;
-
 		pMove();
+		
+		System.out.println(pOnePath.size());
+		System.out.println(pTwoPath.size());
+		
+		if(oHitT()){
+			System.out.println("Player one lost");
+			newRound();
+			}
+		else{
+			box1.move();
+			}
+		if(tHitO()){
+			System.out.println("Player two lost");
+			newRound();
+			}
+		else{
+			box2.move();
+			}	
+		//int p1wins = 0;
+		//int p2wins = 0;
+
+		//pMove();
 		//pOneMove();
 		//pTwoMove();
 
-		box1.move();
-		box2.move();
+		//box1.move();
+		//box2.move();
 
 		//if(box.)
 		//tick();
@@ -274,7 +412,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			//System.out.println(box1.getHit());
 
 			if(keys[KeyEvent.VK_SPACE]){
-				nextRound();
+				newRound();
 			}
 		}
 
@@ -295,7 +433,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			}
 
 			if(keys[KeyEvent.VK_SPACE]){
-				nextRound();
+				newRound();
 			}
 		}
 	}
@@ -333,11 +471,13 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		}
 	}
 
-	public void nextRound(){
+	public void newRound(){
 		System.out.println("New Round");
 		box1 = new Spot(600,470);
 		box2 = new Spot(250,470);
-
+		pOnePath.clear();
+		pTwoPath.clear();
+		newRound=true;
 		System.out.println("P1 Wins: "+p1wins);
 		System.out.println("P2 Wins: "+p2wins);
 
@@ -358,6 +498,496 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		
 	}
 }
+
+
+
+
+/*//Game3.java
+
+//HOT DIGGITY DOG!
+
+//import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.image.*;
+
+public class simpleGame extends JFrame implements ActionListener{ //inherits from JFrame, JFrame and More :O
+	//ACtionLIstner is a interface. BArgain- we provide the methods it wants, and it will do stuff when needed
+	Timer myTimer;
+	GamePanel game;
+
+	JPanel cards;   	//a panel that uses CardLayout
+    CardLayout cLayout = new CardLayout();  
+	JButton twoPlayersBtn = new JButton("2 players"); //single player btn on the main screen
+	JButton onePlayerBtn = new JButton("1 player"); //two player btn on the main screen
+	
+	public simpleGame(){
+		super("Tron"); //calls constructor of super frame, must be first line of constructor
+		setSize(900,800);
+		
+		twoPlayersBtn.addActionListener(this);
+		onePlayerBtn.addActionListener(this);
+		
+		myTimer = new Timer(30,this);
+		//myTimer.start();
+		game = new GamePanel();
+		
+		ImageIcon back = new ImageIcon("menu.png"); //image for the bkg of the main page
+		JLabel backLabel = new JLabel(back);
+		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane, allows control of what shows on top
+		mPage.setLayout(null);
+		
+		backLabel.setSize(900,800);
+		backLabel.setLocation(0,0);
+		mPage.add(backLabel,1); //adds bkg image to the main page, as the first layer	
+		
+		//buttons on the main screen
+		twoPlayersBtn.setSize(120,30);
+		twoPlayersBtn.setLocation(550,700);
+		ImageIcon btnTwo = new ImageIcon("btnTwo.png");
+		twoPlayersBtn.setIcon(btnTwo);
+		mPage.add(twoPlayersBtn,3);
+		
+		onePlayerBtn.setSize(120,30);
+		onePlayerBtn.setLocation(200,700);
+		ImageIcon btnOne = new ImageIcon("btnOne.png");
+		onePlayerBtn.setIcon(btnOne);
+		mPage.add(onePlayerBtn,2);
+		
+		
+		ImageIcon oneInstruct = new ImageIcon("onePlayerInstructions.png");
+		JLabel oneInstructLabel = new JLabel(oneInstruct);
+		
+		JLayeredPane oneInstructPage=new JLayeredPane(); //instructions page for 1 player
+		oneInstructPage.setLayout(null);
+		oneInstructLabel.setSize(900,800);
+		oneInstructLabel.setLocation(0,0);
+		oneInstructPage.add(oneInstructLabel,1);	
+		
+		ImageIcon twoInstruct = new ImageIcon("twoPlayerInstructions.png");
+		JLabel twoInstructLabel = new JLabel(twoInstruct);
+		JLayeredPane twoInstructPage=new JLayeredPane(); //instructions page for 1 player
+		twoInstructPage.setLayout(null);
+		twoInstructLabel.setSize(900,800);
+		twoInstructLabel.setLocation(0,0);
+		twoInstructPage.add(twoInstructLabel,1);
+		
+		cards = new JPanel(cLayout);
+		cards.add(mPage, "menu");
+		cards.add(oneInstructPage, "onePlayerInstructions");
+		cards.add(twoInstructPage, "twoPlayerInstructions");
+		cards.add(game, "game");
+		setResizable(false);
+		setVisible(true);
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	public void actionPerformed(ActionEvent e){
+		Object source =e.getSource();
+		if(source==onePlayerBtn){
+			//cLayout.show(cards,"onePlayerInstructions");
+		    cLayout.show(cards,"game"); //uncomment this to show the game part
+		    myTimer.start();
+		}
+		else if(source==twoPlayersBtn){
+			//cLayout.show(cards,"twoPlayerInstructions");
+		    cLayout.show(cards,"game");
+		    myTimer.start();
+		}
+		if(game != null){
+			game.moving();
+			game.pOneMove();
+			game.pTwoMove();
+			game.repaint();
+		}
+	}
+	public static void main(String[]args){
+		new simpleGame();
+	}
+}
+
+class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
+	//private int boxx1, boxy1, boxx2, boxy2, dx, dy;
+	private boolean [] keys;
+	private Spot box1;
+	private Spot box2;
+
+	private int p1_Points, p2_Points;
+	//private ArrayList<Trail>path = new ArrayList<Trail>();
+
+	public GamePanel(){
+		newRound();
+
+		p1_Points = 0;
+		p2_Points = 0;
+
+		setFocusable(true);
+		addKeyListener(this);
+		requestFocus();
+
+		keys = new boolean[KeyEvent.KEY_LAST+1];
+	}
+
+	@Override //think I am overriding one of the methods in JPanel
+	public void paintComponent(Graphics g){ //supply same parameters that replaces it
+		g.setColor(new Color(222,255,222));
+		//g.fillRect(0,0,getWidth(),getHeight());
+
+		g.setColor(new Color(125,125,125));
+		//g.fillRect(50,210,800,520);
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(50,40,125,125);
+		g.fillRect(725,40,125,125);
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(0,0,5,50);
+
+		g.setColor(Color.blue);
+		g.fillRect(box1.getX(),box1.getY(),10,10);
+
+		g.setColor(Color.red);
+		g.fillRect(box2.getX(),box2.getY(),10,10);
+	}
+
+	//ALL THREE MUST BE PRESENT
+	public void keyPressed(KeyEvent e){
+		keys[e.getKeyCode()] = true;
+	}
+
+	public void keyReleased(KeyEvent e){
+		keys[e.getKeyCode()] = false;
+	}
+
+	public void keyTyped(KeyEvent e){} //don't use this for games
+
+	public void moving(){
+		box1.move();
+		box2.move();
+		
+		//path.add(box1.getX(),box1.getY());
+		//path.add(box2.getX(),box2.getY());
+	}
+
+	public void pOneMove(){
+		if(box1.getHit() == false && box2.getHit() == false){
+			if(keys[KeyEvent.VK_ENTER]){
+				box1.turbo();
+			}
+
+			if(keys[KeyEvent.VK_RIGHT]){
+				box1.moveRight();
+			}
+			else if(keys[KeyEvent.VK_LEFT]){
+				box1.moveLeft();
+			}
+			else if(keys[KeyEvent.VK_UP]){
+				box1.moveUp();
+			}
+			else if(keys[KeyEvent.VK_DOWN]){
+				box1.moveDown();
+			}
+		}
+
+		else{
+			box1.noMove();
+
+			if(keys[KeyEvent.VK_SPACE]){
+				newRound();
+			}
+		}
+	}
+
+	public void pTwoMove(){
+		if(box2.getHit() == false && box1.getHit() == false){
+			if(keys[KeyEvent.VK_D]){
+				box2.moveRight();
+			}
+			else if(keys[KeyEvent.VK_A]){
+				box2.moveLeft();
+			}
+			else if(keys[KeyEvent.VK_W]){
+				box2.moveUp();
+			}
+			else if(keys[KeyEvent.VK_S]){
+				box2.moveDown();
+			}
+		}
+
+		else{
+			box2.noMove();
+			
+			if(keys[KeyEvent.VK_SPACE]){
+				newRound();
+			}
+		}
+	}
+
+	public void newRound(){
+		System.out.println("New Round");
+		box1 = new Spot(650,400);
+		box2 = new Spot(350,400);
+
+		box1.moveLeft();
+		box2.moveRight();
+	}
+}
+
+
+
+/*Game3.java
+
+//HOT DIGGITY DOG!
+
+//import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.image.*;
+
+public class simpleGame extends JFrame implements ActionListener{ //inherits from JFrame, JFrame and More :O
+	//ACtionLIstner is a interface. BArgain- we provide the methods it wants, and it will do stuff when needed
+	Timer myTimer;
+	GamePanel game = new GamePanel();
+	
+	JPanel cards; //a panel that uses CardLayout
+    CardLayout cLayout = new CardLayout();  
+	JButton twoPlayersBtn = new JButton("2 players"); //single player btn on the main screen
+	JButton onePlayerBtn = new JButton("1 player"); //two player btn on the main screen
+	
+	public simpleGame(){
+		super("Tron"); //calls constructor of super frame, must be first line of constructor
+		setSize(900,800); 
+		
+		twoPlayersBtn.addActionListener(this);
+		onePlayerBtn.addActionListener(this);	
+			
+		ImageIcon back = new ImageIcon("menu.png"); //image for the bkg of the main page
+		JLabel backLabel = new JLabel(back);
+		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane, allows control of what shows on top
+		mPage.setLayout(null);
+		
+		backLabel.setSize(900,800);
+		backLabel.setLocation(0,0);
+		mPage.add(backLabel,1); //adds bkg image to the main page, as the first layer					
+		
+		//buttons on the main screen
+		twoPlayersBtn.setSize(120,30);
+		twoPlayersBtn.setLocation(550,700);
+		ImageIcon btnTwo = new ImageIcon("btnTwo.png");
+		twoPlayersBtn.setIcon(btnTwo);
+		mPage.add(twoPlayersBtn,3);
+		
+		onePlayerBtn.setSize(120,30);
+		onePlayerBtn.setLocation(200,700);
+		ImageIcon btnOne = new ImageIcon("btnOne.png");
+		onePlayerBtn.setIcon(btnOne);
+		mPage.add(onePlayerBtn,2);
+		
+		ImageIcon oneInstruct = new ImageIcon("onePlayerInstructions.png");
+		JLabel oneInstructLabel = new JLabel(oneInstruct);
+		
+		JLayeredPane oneInstructPage=new JLayeredPane(); //instructions page for 1 player
+		oneInstructPage.setLayout(null);
+		oneInstructLabel.setSize(900,800);
+		oneInstructLabel.setLocation(0,0);
+		oneInstructPage.add(oneInstructLabel,1);	
+		
+		
+		ImageIcon twoInstruct = new ImageIcon("twoPlayerInstructions.png");
+		JLabel twoInstructLabel = new JLabel(twoInstruct);
+		JLayeredPane twoInstructPage=new JLayeredPane(); //instructions page for 1 player
+		twoInstructPage.setLayout(null);
+		twoInstructLabel.setSize(900,800);
+		twoInstructLabel.setLocation(0,0);
+		twoInstructPage.add(twoInstructLabel,1);
+		
+		myTimer = new Timer(30,this);
+		//myTimer.start();
+		//game = new GamePanel();
+		//add(game);
+		
+		cards = new JPanel(cLayout);
+		cards.add(mPage, "menu");
+		cards.add(oneInstructPage, "onePlayerInstructions");
+		cards.add(twoInstructPage, "twoPlayerInstructions");
+		cards.add(game, "game");
+
+		add(cards);
+		
+		setResizable(false);
+		setVisible(true);
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	public void actionPerformed(ActionEvent e){
+		Object source = e.getSource();
+		if(source==onePlayerBtn){
+			//cLayout.show(cards,"onePlayerInstructions");
+		    cLayout.show(cards,"game");
+		  
+		    myTimer.start();
+		    
+		}
+		else if(source==twoPlayersBtn){
+			//cLayout.show(cards,"twoPlayerInstructions");
+		    cLayout.show(cards,"game");
+		   
+		    myTimer.start();
+		   
+		}
+		
+		if(source == myTimer){
+			game.moving();
+			game.pOneMove();
+			game.pTwoMove();
+			game.repaint();
+		}
+		/*if(game != null){
+			game.moving();
+			game.pOneMove();
+			game.pTwoMove();
+			game.repaint();
+		}
+
+	}
+	public static void main(String[]args){
+		new simpleGame();
+	}
+}
+
+class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
+	//private int boxx1, boxy1, boxx2, boxy2, dx, dy;
+	private boolean [] keys;
+	private Spot box1;
+	private Spot box2;
+
+	private int p1_Points, p2_Points;
+	//private ArrayList<Trail>path = new ArrayList<Trail>();
+
+	public GamePanel(){
+		newRound();
+
+		p1_Points = 0;
+		p2_Points = 0;
+
+		setFocusable(true);
+		addKeyListener(this);
+		requestFocus();
+
+		keys = new boolean[KeyEvent.KEY_LAST+1];
+	}
+
+	@Override //think I am overriding one of the methods in JPanel
+	public void paintComponent(Graphics g){ //supply same parameters that replaces it
+		g.setColor(new Color(222,255,222));
+		g.fillRect(0,0,getWidth(),getHeight());
+
+		g.setColor(new Color(125,125,125));
+		g.fillRect(50,210,800,520);
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(50,40,125,125);
+		g.fillRect(725,40,125,125);
+
+		g.setColor(new Color(200,200,200));
+		g.fillRect(0,0,5,50);
+
+		g.setColor(Color.blue);
+		g.fillRect(box1.getX(),box1.getY(),10,10);
+
+		g.setColor(Color.red);
+		g.fillRect(box2.getX(),box2.getY(),10,10);
+	}
+
+	//ALL THREE MUST BE PRESENT
+	public void keyPressed(KeyEvent e){
+		keys[e.getKeyCode()] = true;
+	}
+
+	public void keyReleased(KeyEvent e){
+		keys[e.getKeyCode()] = false;
+	}
+
+	public void keyTyped(KeyEvent e){} //don't use this for games
+
+	public void moving(){
+		box1.move();
+		box2.move();
+		
+		//pOneMove();
+		//pTwoMove();
+
+		//path.add(box1.getX(),box1.getY());
+		//path.add(box2.getX(),box2.getY());
+	}
+
+	public void pOneMove(){
+		if(box1.getHit() == false && box2.getHit() == false){
+			if(keys[KeyEvent.VK_ENTER]){
+				box1.turbo();
+			}
+
+			if(keys[KeyEvent.VK_RIGHT]){
+				box1.moveRight();
+			}
+			else if(keys[KeyEvent.VK_LEFT]){
+				box1.moveLeft();
+			}
+			else if(keys[KeyEvent.VK_UP]){
+				box1.moveUp();
+			}
+			else if(keys[KeyEvent.VK_DOWN]){
+				box1.moveDown();
+			}
+		}
+
+		else{
+			box1.noMove();
+
+			if(keys[KeyEvent.VK_SPACE]){
+				newRound();
+			}
+		}
+	}
+
+	public void pTwoMove(){
+		if(box2.getHit() == false && box1.getHit() == false){
+			if(keys[KeyEvent.VK_D]){
+				box2.moveRight();
+			}
+			else if(keys[KeyEvent.VK_A]){
+				box2.moveLeft();
+			}
+			else if(keys[KeyEvent.VK_W]){
+				box2.moveUp();
+			}
+			else if(keys[KeyEvent.VK_S]){
+				box2.moveDown();
+			}
+		}
+
+		else{
+			box2.noMove();
+			
+			if(keys[KeyEvent.VK_SPACE]){
+				newRound();
+			}
+		}
+	}
+
+	public void newRound(){
+		System.out.println("New Round");
+		box1 = new Spot(650,400);
+		box2 = new Spot(350,400);
+
+		box1.moveLeft();
+		box2.moveRight();
+	}
+}*/
 
 
 
