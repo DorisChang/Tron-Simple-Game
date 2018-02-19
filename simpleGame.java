@@ -154,7 +154,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private boolean [] keys;
 	private Spot box1;
 	private Spot box2;
-	private Image back, btw;
+	private Image back, btw, rOver;
 
 	private int p1points, p2points, p1matches, p2matches; //points from 0-3 during each match (3 ends the game)
 	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
@@ -192,7 +192,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		nextRound();
 		back = new ImageIcon("images/GameScreen.png").getImage();
 		btw = new ImageIcon("images/EndMatch.png").getImage();
-		
+		rOver = new ImageIcon("images/EndRoundSlip.png").getImage();
 		p = new Rectangle(0,0,10,10);
 		
 		p1matches = 0;
@@ -216,6 +216,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		//g.fillRect(0,0,getWidth(),getHeight());
 		//g.drawImage(back,0,0,this);
 		
+			
 		if(p1points == 3 || p2points == 3){ //if someone wins the match
 			g.drawImage(btw,0,0,this);
 			g.setColor(new Color(250,250,250));
@@ -225,6 +226,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			g.drawString(""+p2matches, 480,630);
 			}
 			
+		
 		else{
 			g.drawImage(back,0,0,this);
 			//Board
@@ -408,6 +410,10 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 				g.setColor(new Color(189,255,0));
 				g.drawRect((int)p.getX(),(int)p.getY(),(int)p.getWidth(),(int)p.getHeight());
 			}
+			
+			if(roundOver){ //changes the text at the bottom of the screen (tells players to press space to continue)
+				g.drawImage(rOver,0,710,this);
+				}
 		}
 
 		/*//Board
@@ -656,7 +662,6 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box2.noMove();
 
 			powerTaken = -1;
-
 			roundOver = true;
 		}
 
