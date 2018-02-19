@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.image.*;
 
 public class simpleGame extends JFrame implements ActionListener{ //inherits from JFrame, JFrame and More :O
-	//ACtionLIstner is a interface. BArgain- we provide the methods it wants, and it will do stuff when needed
+	//ACtionLIstner is a interface. Bargain- we provide the methods it wants, and it will do stuff when needed
 	Timer myTimer;
 	Timer powerUpTimer;
 	GamePanel game;
@@ -79,7 +79,7 @@ class GameMenu extends JFrame implements KeyListener{
  		setSize(850,800);
  		sg = m;
  		
- 		ImageIcon back = new ImageIcon("images/menu.png");
+ 		ImageIcon back = new ImageIcon("images/titleScreen.png");
  		JLabel backLabel = new JLabel(back);
  		JLayeredPane mPage=new JLayeredPane(); 	
  		mPage.setLayout(null);
@@ -105,7 +105,6 @@ class GameMenu extends JFrame implements KeyListener{
 
 		}
 	public void keyReleased(KeyEvent e){
-		//keys[e.getKeyCode()] = false;
 		}
 	public void keyTyped(KeyEvent e){ 
 		}
@@ -120,7 +119,7 @@ class InstructMenu extends JFrame implements KeyListener{
  		setSize(850,800);
  		bg = m;
  		
- 		ImageIcon back = new ImageIcon("images/instruct.png");
+ 		ImageIcon back = new ImageIcon("images/Instructions.png");
  		JLabel backLabel = new JLabel(back);
  		JLayeredPane mPage=new JLayeredPane(); 
  		mPage.setLayout(null);
@@ -145,7 +144,6 @@ class InstructMenu extends JFrame implements KeyListener{
 		}
 		
 	public void keyReleased(KeyEvent e){
-		//keys[e.getKeyCode()] = false;
 		}
 	public void keyTyped(KeyEvent e){ 
 		}
@@ -156,7 +154,7 @@ class BtwMenu extends JFrame implements KeyListener{
  	private boolean [] keys;
  	
  	public BtwMenu(simpleGame m){
- 		super("between matches menu");
+ 		super("menu between matches");
  		setSize(850,800);
  		bg = m;
  		
@@ -197,6 +195,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private boolean [] keys;
 	private Spot box1;
 	private Spot box2;
+	private Image back;
 
 	private int p1points, p2points; //points from 0-3 during each match (3 ends the game)
 	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
@@ -208,10 +207,10 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private int blitNewObject = 10;
 	private int timeLeft = 140;
 	private int turboTime1 = 5, turboTime2 = 5;
-	private boolean objectOnScreen, blitted, roundOver;
+	private boolean objectOnScreen, blitted, roundOver, pressedSpace;
 	private int powerTaken; //0 for not taken, 1 for player 1, 2 for player 2
 	private int randPowerUp;
-
+	
 	
 
 	/*RAND POWERS
@@ -232,7 +231,8 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	//==============Constructor=============
 	public GamePanel(){
 		nextRound();
-
+		back = new ImageIcon("images/GameScreen.png").getImage();
+		
 		p = new Rectangle(0,0,10,10);
 
 		p1points = 0;
@@ -250,46 +250,34 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	public void paintComponent(Graphics g){ //supply same parameters that replaces it
 		//Background	
 		g.setColor(new Color(0,0,0));
-		g.fillRect(0,0,getWidth(),getHeight());
+		//g.fillRect(0,0,getWidth(),getHeight());
+		g.drawImage(back,0,0,this);
 
 		//Board
 		g.setColor(new Color(125,125,125));
-		g.fillRect(60,110,730,635);
+		//g.fillRect(60,110,730,635);
 
 		//Player Cards
 		g.setColor(new Color(200,200,200));
-		g.fillRect(20,20,75,75);
-		g.fillRect(760,20,75,75);
-
-		//Bottom Bar
-		g.fillRect(60,710,730,35);
 
 		//Turbo Bar
-		g.fillRect(135,65,80,30);
-		g.fillRect(650,65,80,30);
+		//g.fillRect(135,65,80,30); OLD
+		//g.fillRect(650,65,80,30); OLD
+		
+		g.fillRect(146,81,80,20);
+		g.fillRect(640,81,80,20);
 
 		//Power Up Timer
-		g.fillRect(105,20,10,75);
-		g.fillRect(740,20,10,75);
+		g.fillRect(108,30,10,75);
+		g.fillRect(741,30,10,75);
 
 		//=====Rounds Won Bar====
 		//Number Square
+		g.setColor(new Color(0,0,0));
+		g.setFont(new Font("Calibri",Font.PLAIN,32));
+		g.drawString(""+p1points, 253,72);
+		g.drawString(""+p2points, 588,72);
 		g.setColor(new Color(17,122,72));
-		g.fillRect(240,40,40,40);
-		g.fillRect(575,40,40,40);
-		g.setColor(new Color(250,250,250));
-		g.setFont(new Font("Comic Sans MS",Font.PLAIN,32));
-		g.drawString(""+p1points, 250,70);
-		g.drawString(""+p2points, 585,70);
-		g.setColor(new Color(17,122,72));
-		
-		//Fill Bar
-		g.fillRect(295,55,119,5);
-		g.fillRect(439,55,119,5);
-
-		//Space Bar
-		g.setColor(new Color(255,255,255));
-		g.fillRect(200,712,450,31);
 
 		//========Trails========
 		ArrayList<Rectangle>aTrail = box1.returnTrail();
@@ -313,15 +301,16 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//time left
 		g.setColor(new Color(100,0,0));
-		g.fillRect(107,22,6,70);
+		g.fillRect(110,30,6,70);
 
 		//time gone
-		g.setColor(Color.red);
+		//g.setColor(Color.red);
 		if(powerTaken == 1){
-			g.fillRect(107,22+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
+			g.fillRect(110,30+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
 			//System.out.println(timeLeft);
 		}
-
+		
+	
 		//turbo counters
 		g.setColor(new Color(100,0,0));
 		for(int i = 3 - box1.countTurboLeft(); i > 0; i--){
@@ -354,15 +343,17 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//time gone
 		g.setColor(new Color(0,0,100));
-		g.fillRect(742,22,6,70);
+		g.fillRect(743,30,6,70);
 
 		//time left
-		g.setColor(Color.blue);
+		//g.setColor(Color.blue);
 		if(powerTaken == 2){
-			g.fillRect(742,22+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
+			g.fillRect(743,30+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
 			System.out.println(timeLeft);
 		}
-
+		
+		
+		
 		//empty turbo counter
 		g.setColor(new Color(0,0,100));
 		for(int i = 3 - box2.countTurboLeft(); i > 0; i--){
@@ -463,7 +454,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//System.out.println(box1.returnX());
 
-		//box2.noMove();
+		box2.noMove();
 
 		/*if(box1.turboInitiated()){
 			box1.turbo();
@@ -544,17 +535,19 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			}
 		
 		if(p1points == 3){ //if player 1 wins the match
-			setVisible(false);
-			//game.between();
+			//setVisible(false);
+	
 			p1points = 0; 
 			p2points = 0;
+			//pressedSpace = false;
 			}
 		
 		if(p2points == 3){ //if player 2 wins the match
-			setVisible(false);
-			//game.between();
+			//setVisible(false);
+	
 			p1points = 0;
 			p2points = 0;
+			//pressedSpace = false;
 			}
 			
 		//Power Up Timer
@@ -850,6 +843,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		else{
 			//System.out.println("NEXT");
 			if(keys[KeyEvent.VK_SPACE]){
+				pressedSpace = true;
 				p1wins = false;
 				p2wins = false;
 				nextRound();
@@ -910,6 +904,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		blitNewObject = 10;
 		onScreenLifeTime = 0;
 		roundOver = false;
+		pressedSpace = false;
 
 		/*if(box1.countRoundWins() == 3){
 			box1.winBattle();
