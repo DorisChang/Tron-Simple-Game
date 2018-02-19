@@ -149,55 +149,14 @@ class InstructMenu extends JFrame implements KeyListener{
 		}
 	}
 
-class BtwMenu extends JFrame implements KeyListener{
- 	private simpleGame bg;
- 	private boolean [] keys;
- 	
- 	public BtwMenu(simpleGame m){
- 		super("menu between matches");
- 		setSize(850,800);
- 		bg = m;
- 		
- 		ImageIcon back = new ImageIcon("images/btw.png");
- 		JLabel backLabel = new JLabel(back);
- 		JLayeredPane mPage=new JLayeredPane(); 
- 		mPage.setLayout(null);
- 		
- 		backLabel.setSize(855,800);
- 		backLabel.setLocation(0,0);
- 		mPage.add(backLabel,1);					
- 			
- 		add(mPage);
- 		addKeyListener(this);
- 		setVisible(true);
- 		keys = new boolean[KeyEvent.KEY_LAST+1];
- 		}
- 	
- 	public void keyPressed(KeyEvent e){
-		keys[e.getKeyCode()] = true;
-			
-		if(keys[KeyEvent.VK_SPACE]){
-			bg.start();
-			setVisible(false);	
-			}
-		}
-		
-	public void keyReleased(KeyEvent e){
-		//keys[e.getKeyCode()] = false;
-		}
-	public void keyTyped(KeyEvent e){ 
-		}
-		
- 	} 	
-
 
 class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
 	private boolean [] keys;
 	private Spot box1;
 	private Spot box2;
-	private Image back;
+	private Image back, btw;
 
-	private int p1points, p2points; //points from 0-3 during each match (3 ends the game)
+	private int p1points, p2points, p1matches, p2matches; //points from 0-3 during each match (3 ends the game)
 	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
 	private boolean pointAdded; //boolean to keep prevent more than one point from being rewarded for the same action
 
@@ -232,9 +191,13 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	public GamePanel(){
 		nextRound();
 		back = new ImageIcon("images/GameScreen.png").getImage();
+		btw = new ImageIcon("images/EndMatch.png").getImage();
 		
 		p = new Rectangle(0,0,10,10);
-
+		
+		p1matches = 0;
+		p2matches = 0;
+		
 		p1points = 0;
 		p2points = 0;
 
@@ -249,11 +212,205 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	@Override //think I am overriding one of the methods in JPanel
 	public void paintComponent(Graphics g){ //supply same parameters that replaces it
 		//Background	
-		g.setColor(new Color(0,0,0));
+		//g.setColor(new Color(0,0,0));
 		//g.fillRect(0,0,getWidth(),getHeight());
-		g.drawImage(back,0,0,this);
+		//g.drawImage(back,0,0,this);
+		
+		if(p1points == 3 || p2points == 3){ //if someone wins the match
+			g.drawImage(btw,0,0,this);
+			g.setColor(new Color(250,250,250));
+			g.setFont(new Font("Calibri",Font.PLAIN,32));
+			g.drawString(""+p1matches, 360,630);
+			g.drawString("-",420,630);
+			g.drawString(""+p2matches, 480,630);
+			}
+			
+		else{
+			g.drawImage(back,0,0,this);
+			//Board
+			g.setColor(new Color(125,125,125));
+			//g.fillRect(60,110,730,635);
+	
+			//Player Cards
+			g.setColor(new Color(200,200,200));
+	
+			//Turbo Bar
+			//g.fillRect(135,65,80,30); OLD
+			//g.fillRect(650,65,80,30); OLD
+			
+			g.fillRect(146,81,80,20);
+			g.fillRect(640,81,80,20);
+	
+			//Power Up Timer
+			g.fillRect(108,30,10,75);
+			g.fillRect(741,30,10,75);
+	
+			//=====Rounds Won Bar====
+			//Number Square
+			g.setColor(new Color(0,0,0));
+			g.setFont(new Font("Calibri",Font.PLAIN,32));
+			g.drawString(""+p1points, 253,72);
+			g.drawString(""+p2points, 588,72);
+			g.setColor(new Color(17,122,72));
+	
+			//========Trails========
+			ArrayList<Rectangle>aTrail = box1.returnTrail();
+			g.setColor(new Color(103,245,100));
+	
+			//Player 1 Trail
+			for(int i = 0; i < aTrail.size(); i++){
+				Rectangle trail = aTrail.get(i);
+				g.fillRect((int)trail.getX(),(int)trail.getY(),(int)trail.getWidth(),(int)trail.getHeight());
+			}
+	
+			//turbo left
+			for(int i = 0; i < box1.countTurboLeft(); i++){
+				g.fillRect(140+25*i,70,20,20);
+			}
+	
+			//p1 win bar
+			for(int i = 0; i < p1points; i++){
+				g.fillRect(297+39*i,56,37,3);
+			}
+	
+			//time left
+			g.setColor(new Color(100,0,0));
+			g.fillRect(110,30,6,70);
+	
+			//time gone
+			//g.setColor(Color.red);
+			if(powerTaken == 1){
+				g.fillRect(110,30+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
+				//System.out.println(timeLeft);
+			}
+			
+		
+			//turbo counters
+			g.setColor(new Color(100,0,0));
+			for(int i = 3 - box1.countTurboLeft(); i > 0; i--){
+				g.fillRect(215-25*i,70,20,20);
+			}
+	
+			//empty win counter
+			for(int i = 3-p1points; i > 0; i--){
+				g.fillRect(414-39*i,56,37,3);
+			}
+	
+			//Player 2 Trail
+			ArrayList<Rectangle>bTrail = box2.returnTrail();
+			g.setColor(new Color(145,98,100));
+	
+			for(int i = 0; i < bTrail.size(); i++){
+				Rectangle trail2 = bTrail.get(i);
+				g.fillRect((int)trail2.getX(),(int)trail2.getY(),(int)trail2.getWidth(),(int)trail2.getHeight());
+			}
+	
+			//turbo left
+			for(int i = 0; i < box2.countTurboLeft(); i++){
+				g.fillRect(655+25*i,70,20,20);
+			}
+	
+			//p2 wins bar
+			for(int i = 0; i < p2points; i++){
+				g.fillRect(441+39*i,56,37,3);
+			}
+	
+			//time gone
+			g.setColor(new Color(0,0,100));
+			g.fillRect(743,30,6,70);
+	
+			//time left
+			//g.setColor(Color.blue);
+			if(powerTaken == 2){
+				g.fillRect(743,30+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
+				System.out.println(timeLeft);
+			}
+			
+			
+			
+			//empty turbo counter
+			g.setColor(new Color(0,0,100));
+			for(int i = 3 - box2.countTurboLeft(); i > 0; i--){
+				g.fillRect(730-25*i,70,20,20);
+			}
+	
+			//empty win bar
+			for(int i = 3-p2points; i > 0; i--){
+				g.fillRect(558-39*i,56,37,3);
+			}
+	
+			//Players (Ovals)
+			g.setColor(new Color(200,200,200));
+			g.fillOval(box1.returnX()-1,box1.returnY()-1,6,6);
+			g.fillOval(box2.returnX()-1,box2.returnY()-1,6,6);
+	
+			g.setColor(Color.red);
+			g.fillOval(box1.returnX(),box1.returnY(),4,4);
+	
+			g.setColor(Color.blue);
+			g.fillOval(box2.returnX(),box2.returnY(),4,4);
+	
+			//Colliding Rectangles (Testing Only - Delete afterwards)
+			Rectangle rect1 = box1.drawR();
+			Rectangle rect2 = box2.drawR();
+	
+			g.setColor(new Color(255,255,0));
+			//g.drawRect((int)rect1.getX(),(int)rect1.getY(),(int)rect1.getWidth(),(int)rect1.getHeight());
+	
+			g.setColor(new Color(0,255,255));
+			//g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
+	
+			//Power Ups
+			if(objectOnScreen == true && powerTaken == 0){ //if on screen
+				if(blitted == false){ //choose random powerup
+					randPowerUp = randomPowerUp();
+	
+					Random rand = new Random();
+	
+					px = rand.nextInt(720);
+					py = rand.nextInt(590);
+	
+					p.setLocation(px+60,py+110);
+	
+					blitted = true;
+				}
+	
+				if(randPowerUp == 0){
+					//System.out.println("Extra Turbo");
+					g.setColor(new Color(255,255,0));
+				}
+	
+				if(randPowerUp == 1){
+					//System.out.println("Turbo");
+					g.setColor(new Color(0,255,255));
+				}
+	
+				if(randPowerUp == 2){
+					//System.out.println("Double Speed");
+					g.setColor(new Color(255,0,255));
+				}
+	
+				if(randPowerUp == 3){
+					//System.out.println("Shield");
+					g.setColor(new Color(255,255,255));
+				}
+	
+				if(randPowerUp == 4){
+					g.setColor(new Color(255,140,0));
+				}
+	
+				if(randPowerUp == 5){
+					g.setColor(new Color(0,255,0));
+				}
+	
+				g.fillRect(px+60,py+110,10,10);
+	
+				g.setColor(new Color(189,255,0));
+				g.drawRect((int)p.getX(),(int)p.getY(),(int)p.getWidth(),(int)p.getHeight());
+			}
+		}
 
-		//Board
+		/*//Board
 		g.setColor(new Color(125,125,125));
 		//g.fillRect(60,110,730,635);
 
@@ -433,7 +590,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 			g.setColor(new Color(189,255,0));
 			g.drawRect((int)p.getX(),(int)p.getY(),(int)p.getWidth(),(int)p.getHeight());
-		}
+		}*/
 	}
 
 	//===================Moving Players===================
@@ -526,15 +683,21 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			p1points += 1;
 			p1wins = false;
 			pointAdded = true;
+			if(p1points == 3){
+				p1matches += 1;
+				}
 			}
 			
 		if(p2points < 3 && pointAdded == false && p2wins){ //if player 2 should get a point
 			p2points += 1;
 			p2wins = false;
 			pointAdded = true;
+			if(p2points == 3){
+				p2matches += 1;
+				}
 			}
 		
-		if(p1points == 3){ //if player 1 wins the match
+		/*if(p1points == 3){ //if player 1 wins the match
 			//setVisible(false);
 	
 			p1points = 0; 
@@ -548,7 +711,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			p1points = 0;
 			p2points = 0;
 			//pressedSpace = false;
-			}
+			}*/
 			
 		//Power Up Timer
 		tick();
@@ -844,6 +1007,14 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			//System.out.println("NEXT");
 			if(keys[KeyEvent.VK_SPACE]){
 				pressedSpace = true;
+				if(p1points == 3){
+					p1points = 0;
+					p2points = 0;
+					}
+				if(p2points ==3){
+					p1points = 0;
+					p2points = 0;
+					}
 				p1wins = false;
 				p2wins = false;
 				nextRound();
