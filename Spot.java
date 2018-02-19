@@ -84,22 +84,22 @@ public class Spot{
 
 		//==========changing the size of the trail rectangle==========
 		if(xChange < 0){
-			direction = "left";
+			//direction = "left";
 
 			rect.setBounds(cx,cy,width(),height()+5);
 		}
 		else if(xChange > 0){
-			direction = "right";
+			//direction = "right";
 
 			rect.setBounds(sx,sy,-1*width()+5,height()+5);
 		}
 		else if(yChange < 0){
-			direction = "up";
+			//direction = "up";
 
 			rect.setBounds(cx,cy,width()+5,height());
 		}
 		else if(yChange > 0){
-			direction = "down";
+			//direction = "down";
 
 			rect.setBounds(sx,sy,width()+5,-1*height()+5);
 		}
@@ -145,7 +145,7 @@ public class Spot{
 	}
 
 	public boolean checkCollisions(ArrayList<Rectangle> otherTrail){
-		//System.out.println(":OOOOOO");
+		//System.out.println("Shield: "+shield);
 		if(shield == false){
 			Rectangle pRect = new Rectangle(cx+5*deltaX,cy+5*deltaY,w,h);
 
@@ -326,7 +326,9 @@ public class Spot{
 		if(turboLeft == 3){
 			turboLeft = 3;
 		}
+
 		else{
+			System.out.println("Merp");
 			turboLeft += 1;
 		}
 	}
@@ -409,13 +411,63 @@ public class Spot{
 	}
 
 	public void reverseControls(){
-		if(flippedControls == true){
-			flippedControls = false;
+		flippedControls = true;
+
+		/*if(direction == "left"){
+			xChange = 5;
 		}
-		else if(flippedControls == false){
-			flippedControls = true;
+
+		else if(direction == "right"){
+			xChange = -5;
 		}
+
+		else if(direction == "up"){
+			yChange = 5;
+		}
+
+		else if(direction == "down"){
+			yChange = -5;
+		}*/
 	}
+
+	public void revertControls(){
+		flippedControls = false;
+
+		/*if(direction == "left"){
+			xChange = -5;
+		}
+
+		else if(direction == "right"){
+			xChange = 5;
+		}
+
+		else if(direction == "up"){
+			yChange = -5;
+		}
+
+		else if(direction == "down"){
+			yChange = 5;
+		}*/
+	}
+
+	/*public void flip(){
+
+		if(direction == "left"){
+			xChange = 5;
+		}
+
+		else if(direction == "right"){
+			xChange = -5;
+		}
+
+		else if(direction == "up"){
+			yChange = 5;
+		}
+
+		else if(direction == "down"){
+			yChange = -5;
+		}
+	}*/
 
 	public boolean controlsReversed(){
 		return flippedControls;
@@ -423,12 +475,18 @@ public class Spot{
 
 	public void emptyTrail(){
 		trail.clear();
+		sx = cx;
+		sy = cy;
+
+		addSection();
 	}
 	//======================Changing Direction=======================
 	public void moveRight(){
-		addSection();
+		direction = "right";
 		xChange = 5;
 		yChange = 0;
+
+		addSection();
 
 		deltaX = 0;
 		deltaY = 0;
@@ -441,9 +499,11 @@ public class Spot{
 	}
 
 	public void moveLeft(){
-		addSection();
+		direction = "left";
 		xChange = -5;
 		yChange = 0;
+
+		addSection();
 
 		deltaX = -1;
 		deltaY = 0;
@@ -456,10 +516,12 @@ public class Spot{
 	}
 
 	public void moveUp(){
-		addSection();
+		direction = "up";
 		yChange = -5;
 		xChange = 0;
 
+		addSection();
+		
 		deltaX = 0;
 		deltaY = -1;
 
@@ -471,9 +533,11 @@ public class Spot{
 	}
 
 	public void moveDown(){
-		addSection();
+		direction = "down";
 		yChange = 5;
 		xChange = 0;
+
+		addSection();
 
 		deltaX = 0;
 		deltaY = 0;

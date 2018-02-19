@@ -20,15 +20,14 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 		super("Tron"); //calls constructor of super frame, must be first line of constructor
 		setSize(855,800);
 		myTimer = new Timer(40,this);
-		//myTimer.start();
+		myTimer.start();
 		game = new GamePanel();
 		add(game);
 
 		setResizable(false);
-		//setVisible(true);
+		setVisible(true);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		new GameMenu(this);
 	}
 
 	public void actionPerformed(ActionEvent e){
@@ -46,60 +45,11 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 			game.repaint();
 		}
 	}
-	
-	public void start(){
-		myTimer.start();
-		setVisible(true);
-		}
+
 	public static void main(String[]args){
 		new simpleGame();
 	}
 }
-
-class GameMenu extends JFrame implements ActionListener{
-	private simpleGame sg;
-	
-	JButton oPlayBtn = new JButton("one player");
-	JButton tPlayBtn = new JButton("two players");
-	
-	public GameMenu(simpleGame m){
-		super("game menu");
-		setSize(850,800);
-		sg = m;
-		oPlayBtn.addActionListener(this);
-		tPlayBtn.addActionListener(this);
-		
-		ImageIcon back = new ImageIcon("images/menu.png");
-		JLabel backLabel = new JLabel(back);
-		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane allows my to control what shows on top
-		mPage.setLayout(null);
-		
-		backLabel.setSize(855,800);
-		backLabel.setLocation(0,0);
-		mPage.add(backLabel,1);					// The numbers I use when adding to the LayeredPane
-												// are just relative to one another. Higher numbers on top.
-		oPlayBtn.setSize(100,30);
-		ImageIcon btnOne = new ImageIcon("images/btnOne.png");
- 		oPlayBtn.setIcon(btnOne);
-		oPlayBtn.setLocation(200,700);
-		mPage.add(oPlayBtn,2);
-		
-		tPlayBtn.setSize(100,30);
-		ImageIcon btnTwo = new ImageIcon("images/btnTwo.png");
- 		tPlayBtn.setIcon(btnTwo);
-		tPlayBtn.setLocation(550,700);
-		mPage.add(tPlayBtn,2);
-		
-		add(mPage);
-		setVisible(true);
-		}
-		
-	public void actionPerformed(ActionEvent evt) {
-    	sg.start();
-    	setVisible(false);
-    	}
-	}
-
 
 class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
 	private boolean [] keys;
@@ -115,18 +65,18 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private int blitNewObject = 10;
 	private int timeLeft = 140;
 	private int turboTime1 = 5, turboTime2 = 5;
-	private boolean objectOnScreen, blitted;
+	private boolean objectOnScreen, blitted, roundOver;
 	private int powerTaken; //0 for not taken, 1 for player 1, 2 for player 2
 	private int randPowerUp;
 
 	/*RAND POWERS
-	0 - extra turbo (yellow)
-	1 - portal (cyan)
-	2 - double speed (magenta)
-	3 - shield (white)
-	4 - reverse opp. controls (orange)
-	5 - clear trails (green)
-	6 - turbo 
+	0 - extra turbo
+	1 - portal
+	2 - double speed
+	3 - shield
+	4 - reverse opp. controls
+	5 - clear trails
+	6 - turbo
 
 	POWERTAKEN
 	0 - None
@@ -222,7 +172,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		g.setColor(Color.red);
 		if(powerTaken == 1){
 			g.fillRect(107,22+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
-			System.out.println(timeLeft);
+			//System.out.println(timeLeft);
 		}
 
 		//turbo counters
@@ -293,10 +243,10 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		Rectangle rect2 = box2.drawR();
 
 		g.setColor(new Color(255,255,0));
-		g.drawRect((int)rect1.getX(),(int)rect1.getY(),(int)rect1.getWidth(),(int)rect1.getHeight());
+		//g.drawRect((int)rect1.getX(),(int)rect1.getY(),(int)rect1.getWidth(),(int)rect1.getHeight());
 
 		g.setColor(new Color(0,255,255));
-		g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
+		//g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
 
 		//Power Ups
 		if(objectOnScreen == true && powerTaken == 0){ //if on screen
@@ -349,13 +299,13 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	}
 
 	//===================Moving Players===================
-	public void onePlayer(){
+	/*public void onePlayer(){
 		pMove();
 		cMove();
 
 		box1.move();
 		box2.move();
-	}
+	}*/
 
 	public void twoPlayer(){
 		pMove();
@@ -366,7 +316,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//System.out.println(box1.returnX());
 
-		//box1.noMove();
+		box2.noMove();
 
 		/*if(box1.turboInitiated()){
 			box1.turbo();
@@ -411,6 +361,8 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box2.noMove();
 
 			powerTaken = -1;
+
+			roundOver = true;
 		}
 
 		else if(player1Dead){
@@ -419,6 +371,8 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box2.noMove();
 
 			powerTaken = -1;
+
+			roundOver = true;
 		}
 
 		else if(player2Dead){
@@ -427,6 +381,8 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box2.noMove();
 
 			powerTaken = -1;
+
+			roundOver = true;
 		}
 
 		//Power Up Timer
@@ -437,6 +393,29 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	//blitting random power ups
 	public void tick(){
 		if(powerTaken == 0){
+			if(box1.turboSpeed()){
+				turboTime1 -= 1;
+
+				System.out.println(turboTime1);
+
+				if(turboTime1 == 0){
+					//box1.turboSpeed();
+					box1.stopTurbo();
+					turboTime1 = 5;
+					//powerTaken = 0;
+				}
+			}
+
+			if(box2.turboSpeed()){
+				turboTime2 -= 1;
+
+				if(turboTime2 == 0){
+					box2.stopTurbo();
+					turboTime2 = 0;
+					//powerTaken = 0;
+				}
+			}
+
 			if(objectOnScreen == false){ //if the object is not on screen
 				//System.out.println(blitNewObject);
 				blitNewObject -= 1;
@@ -466,27 +445,6 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			blitNewObject = 0;
 			objectOnScreen = false;
 
-			if(box1.turboSpeed()){
-				turboTime1 -= 1;
-
-				//System.out.println(turboTime);
-
-				if(turboTime1 == 0){
-					//box1.turboSpeed();
-					box1.stopTurbo();
-					powerTaken = 0;
-				}
-			}
-
-			if(box2.turboSpeed()){
-				turboTime2 -= 1;
-
-				if(turboTime2 == 0){
-					box2.stopTurbo();
-					powerTaken = 0;
-				}
-			}
-
 			if(powerTaken == 1){
 				powerCountDown(box1,box2);
 			}
@@ -510,34 +468,36 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		if(timeLeft > 0){
 			//System.out.println(timeLeft);
 			if(randPowerUp == 0){
-				System.out.println("Extra Turbo");
+				//System.out.println("Extra Turbo");
 				player.extraTurbo();
 				timeLeft = 1;
 			}
 
 			else if(randPowerUp == 1){
-				System.out.println("Portal");
+				//System.out.println("Portal");
 				player.openPortal();
 			}
 
 			else if(randPowerUp == 2){
-				System.out.println("Double Speed");
+				//System.out.println("Double Speed");
 				otherPlayer.doubleSpeed();
 			}
 
 			else if(randPowerUp == 3){
-				System.out.println("Shield");
+				//System.out.println("Shield");
 				player.shieldUp();
 			}
 
 			else if(randPowerUp == 4){
-				System.out.println("Reverse");
+				//System.out.println("Reverse");
+				otherPlayer.move();
 				otherPlayer.reverseControls();
 				player.noMove();
+				//otherPlayer.doubleSpeed();
 			}
 
 			else if(randPowerUp == 5){
-				System.out.println("Clear");
+				//System.out.println("Clear");
 				player.emptyTrail();
 				otherPlayer.emptyTrail();
 
@@ -562,11 +522,12 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			}
 
 			else if(randPowerUp == 3){
+				//System.out.println("Shield Down");
 				player.shieldDown();
 			}
 
 			else if(randPowerUp == 4){
-				otherPlayer.reverseControls();
+				otherPlayer.revertControls();
 			}
 		}
 	}
@@ -584,7 +545,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	public void keyTyped(KeyEvent e){} //don't use this for games
 
 	public void pMove(){
-		if(box1.getHit() == false && box2.getHit() == false){
+		if(roundOver == false){
 			/*if(box1.returnX() == px+50 && box1.returnY() == py+210){
 				box1.warpWall();
 				lifeTime = 0;
@@ -598,52 +559,26 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 					box1.turbo();
 					//box1.noTurbo();
 
-					turboTime1 = 5;
-					powerTaken = 1;
+					//turboTime1 = 5;
+					//powerTaken = 1;
 				}	
 			}
 
 			//tab for turbo >> p2
 			if(keys[KeyEvent.VK_Q]){
-				System.out.println("HELLO");
+				//System.out.println("HELLO");
 				if(box2.countTurboLeft() > 0){
 					//box1.turboSpeed();
 
 					box2.turbo();
 					//box1.noTurbo();
 
-					turboTime2 = 5;
-					powerTaken = 2;
+					//turboTime2 = 5;
+					//powerTaken = 2;
 				}
 			}
 
-			//Reversed Controls
-			if(box1.controlsReversed()){
-				if(keys[KeyEvent.VK_RIGHT]){
-					if(box1.moveD() != "right"){
-						box1.moveLeft();
-					}
-				}
-				else if(keys[KeyEvent.VK_LEFT]){
-					if(box1.moveD() != "left"){
-						box1.moveRight();
-					}	
-				}
-
-				else if(keys[KeyEvent.VK_UP]){
-					if(box1.moveD() != "up"){
-						box1.moveDown();
-					}
-
-				}
-				else if(keys[KeyEvent.VK_DOWN]){
-					if(box1.moveD() != "down"){
-						box1.moveUp();				
-					}
-				}
-			}
-
-			else if(box1.controlsReversed() == false){
+			if(box1.controlsReversed() == false){
 				if(keys[KeyEvent.VK_RIGHT]){
 					if(box1.moveD() != "left"){
 						box1.moveRight();
@@ -668,32 +603,32 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 				}
 			}
 
-			if(box2.controlsReversed()){
-				if(keys[KeyEvent.VK_D]){
-					if(box2.moveD() != "right"){
-						box2.moveLeft();
+			else if(box1.controlsReversed() == true){
+				if(keys[KeyEvent.VK_RIGHT]){
+					if(box1.moveD() != "right"){
+						box1.moveLeft();
 					}
 				}
-				else if(keys[KeyEvent.VK_A]){
-					if(box2.moveD() != "left"){
-						box2.moveRight();
-					}
+				else if(keys[KeyEvent.VK_LEFT]){
+					if(box1.moveD() != "left"){
+						box1.moveRight();
+					}	
 				}
-				else if(keys[KeyEvent.VK_W]){
-					if(box2.moveD() != "up"){
-						box2.moveDown();
+
+				else if(keys[KeyEvent.VK_UP]){
+					if(box1.moveD() != "up"){
+						box1.moveDown();
 					}
+
 				}
-				else if(keys[KeyEvent.VK_S]){
-					if(box2.moveD() != "down"){
-						box2.moveUp();
+				else if(keys[KeyEvent.VK_DOWN]){
+					if(box1.moveD() != "down"){
+						box1.moveRight();				
 					}
 				}
 			}
 
-			//Normal controls
-			else if(box2.controlsReversed() == false){
-				//change direction of p2
+			if(box2.controlsReversed() == false){
 				if(keys[KeyEvent.VK_D]){
 					if(box2.moveD() != "left"){
 						box2.moveRight();
@@ -712,19 +647,43 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 				else if(keys[KeyEvent.VK_S]){
 					if(box2.moveD() != "up"){
 						box2.moveDown();
+					}
+				}
+			}
+
+			else if(box2.controlsReversed() == true){
+				if(keys[KeyEvent.VK_D]){
+					if(box2.moveD() != "right"){
+						box2.moveLeft();
+					}
+				}
+				else if(keys[KeyEvent.VK_A]){
+					if(box2.moveD() != "left"){
+						box2.moveRight();
+					}
+				}
+				else if(keys[KeyEvent.VK_W]){
+					if(box2.moveD() != "up"){
+						box2.moveDown();
+					}
+				}
+				else if(keys[KeyEvent.VK_S]){
+					if(box2.moveD() != "down"){
+						box2.moveUp();
 					}
 				}
 			}
 		}
 
 		else{
+			//System.out.println("NEXT");
 			if(keys[KeyEvent.VK_SPACE]){
 				nextRound();
 			}
 		}
 	}
 
-	public void cMove(){ //computer moves
+	/*public void cMove(){ //computer moves
 		if(box2.getHit() == false && box1.getHit() == false){
 			Random rand = new Random();
 
@@ -755,7 +714,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		else{
 			box2.noMove();
 		}
-	}
+	}*/
 
 	public void nextRound(){
 		System.out.println("New Round");
@@ -775,6 +734,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		randPowerUp = 0;
 		blitNewObject = 10;
 		onScreenLifeTime = 0;
+		roundOver = false;
 
 		/*if(box1.countRoundWins() == 3){
 			box1.winBattle();
