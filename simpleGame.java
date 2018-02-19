@@ -47,6 +47,14 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 		}
 	}
 	
+	public void instructions(){
+		new InstructMenu(this);
+		}
+		
+	public void between(){
+		new BtwMenu(this);
+		}
+	
 	public void start(){
  		myTimer.start();
  		setVisible(true);
@@ -62,86 +70,126 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 	}
 }
 
-class GameMenu extends JFrame implements ActionListener{
- 	private simpleGame sg;
- 	
- 	JButton oPlayBtn = new JButton("one player");
- 	JButton tPlayBtn = new JButton("two players");
+class GameMenu extends JFrame implements KeyListener{
+ 	private simpleGame sg; 
+ 	private boolean [] keys;
  	
  	public GameMenu(simpleGame m){
  		super("game menu");
  		setSize(850,800);
  		sg = m;
- 		oPlayBtn.addActionListener(this);
- 		tPlayBtn.addActionListener(this);
  		
  		ImageIcon back = new ImageIcon("images/menu.png");
  		JLabel backLabel = new JLabel(back);
- 		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane allows my to control what shows on top
+ 		JLayeredPane mPage=new JLayeredPane(); 	
  		mPage.setLayout(null);
  		
  		backLabel.setSize(855,800);
  		backLabel.setLocation(0,0);
- 		mPage.add(backLabel,1);					// The numbers I use when adding to the LayeredPane
- 												// are just relative to one another. Higher numbers on top.
- 		oPlayBtn.setSize(100,30);
- 		ImageIcon btnOne = new ImageIcon("images/btnOne.png");
-  		oPlayBtn.setIcon(btnOne);
- 		oPlayBtn.setLocation(200,700);
- 		mPage.add(oPlayBtn,2);
- 		
- 		tPlayBtn.setSize(100,30);
- 		ImageIcon btnTwo = new ImageIcon("images/btnTwo.png");
-  		tPlayBtn.setIcon(btnTwo);
- 		tPlayBtn.setLocation(550,700);
- 		mPage.add(tPlayBtn,2);
- 		
+ 		mPage.add(backLabel,1);				
+ 			
  		add(mPage);
+ 		addKeyListener(this);
  		setVisible(true);
+ 		keys = new boolean[KeyEvent.KEY_LAST+1];
  		}
- 		
- 	public void actionPerformed(ActionEvent evt) {
-     	sg.start();
-     	setVisible(false);
-     
-     	}
- 	}
+    
+    public void keyPressed(KeyEvent e){
+		keys[e.getKeyCode()] = true;
+			
+		if(keys[KeyEvent.VK_SPACE]){
+			//sg.start();
+			sg.instructions();
+			setVisible(false);	
+			}
 
-class BtwMenu extends JFrame implements KeyListener{
- 	private simpleGame bg;
+		}
+	public void keyReleased(KeyEvent e){
+		//keys[e.getKeyCode()] = false;
+		}
+	public void keyTyped(KeyEvent e){ 
+		}
+ 	}
+ 	
+class InstructMenu extends JFrame implements KeyListener{
+	private simpleGame bg;
  	private boolean [] keys;
  	
- 	public BtwMenu(simpleGame m){
- 		super("game menu");
+ 	public InstructMenu(simpleGame m){
+ 		super("instructions");
  		setSize(850,800);
  		bg = m;
  		
- 		ImageIcon back = new ImageIcon("images/menu.png");
+ 		ImageIcon back = new ImageIcon("images/instruct.png");
  		JLabel backLabel = new JLabel(back);
- 		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane allows my to control what shows on top
+ 		JLayeredPane mPage=new JLayeredPane(); 
  		mPage.setLayout(null);
  		
  		backLabel.setSize(855,800);
  		backLabel.setLocation(0,0);
- 		mPage.add(backLabel,1);					// The numbers I use when adding to the LayeredPane
- 												// are just relative to one another. Higher numbers on top.
+ 		mPage.add(backLabel,1);					
+ 			
  		add(mPage);
+ 		addKeyListener(this);
  		setVisible(true);
  		keys = new boolean[KeyEvent.KEY_LAST+1];
  		}
  	
  	public void keyPressed(KeyEvent e){
 		keys[e.getKeyCode()] = true;
-		if(keys[KeyEvent.VK_ENTER]){
+			
+		if(keys[KeyEvent.VK_SPACE]){
 			bg.start();
-			setVisible(false);
+			setVisible(false);	
 			}
 		}
+		
 	public void keyReleased(KeyEvent e){
-		keys[e.getKeyCode()] = false;
+		//keys[e.getKeyCode()] = false;
 		}
-	public void keyTyped(KeyEvent e){ //have to implement all 3 
+	public void keyTyped(KeyEvent e){ 
 		}
+	}
+
+class BtwMenu extends JFrame implements KeyListener{
+ 	private simpleGame bg;
+ 	private boolean [] keys;
+ 	
+ 	public BtwMenu(simpleGame m){
+ 		super("between matches menu");
+ 		setSize(850,800);
+ 		bg = m;
+ 		
+ 		ImageIcon back = new ImageIcon("images/btw.png");
+ 		JLabel backLabel = new JLabel(back);
+ 		JLayeredPane mPage=new JLayeredPane(); 
+ 		mPage.setLayout(null);
+ 		
+ 		backLabel.setSize(855,800);
+ 		backLabel.setLocation(0,0);
+ 		mPage.add(backLabel,1);					
+ 			
+ 		add(mPage);
+ 		addKeyListener(this);
+ 		setVisible(true);
+ 		keys = new boolean[KeyEvent.KEY_LAST+1];
+ 		}
+ 	
+ 	public void keyPressed(KeyEvent e){
+		keys[e.getKeyCode()] = true;
+			
+		if(keys[KeyEvent.VK_SPACE]){
+			bg.start();
+			setVisible(false);	
+			}
+		}
+		
+	public void keyReleased(KeyEvent e){
+		//keys[e.getKeyCode()] = false;
+		}
+	public void keyTyped(KeyEvent e){ 
+		}
+		
  	} 	
 
 
@@ -150,9 +198,9 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private Spot box1;
 	private Spot box2;
 
-	private int p1points, p2points;
-	private boolean p1wins = false, p2wins = false;
-	private boolean pointAdded;
+	private int p1points, p2points; //points from 0-3 during each match (3 ends the game)
+	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
+	private boolean pointAdded; //boolean to keep prevent more than one point from being rewarded for the same action
 
 	private Rectangle p;
 	private int px = 0, py = 0;
@@ -229,7 +277,12 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		g.setColor(new Color(17,122,72));
 		g.fillRect(240,40,40,40);
 		g.fillRect(575,40,40,40);
-
+		g.setColor(new Color(250,250,250));
+		g.setFont(new Font("Comic Sans MS",Font.PLAIN,32));
+		g.drawString(""+p1points, 250,70);
+		g.drawString(""+p2points, 585,70);
+		g.setColor(new Color(17,122,72));
+		
 		//Fill Bar
 		g.fillRect(295,55,119,5);
 		g.fillRect(439,55,119,5);
@@ -240,7 +293,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//========Trails========
 		ArrayList<Rectangle>aTrail = box1.returnTrail();
-		g.setColor(Color.red);
+		g.setColor(new Color(103,245,100));
 
 		//Player 1 Trail
 		for(int i = 0; i < aTrail.size(); i++){
@@ -282,7 +335,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//Player 2 Trail
 		ArrayList<Rectangle>bTrail = box2.returnTrail();
-		g.setColor(Color.blue);
+		g.setColor(new Color(145,98,100));
 
 		for(int i = 0; i < bTrail.size(); i++){
 			Rectangle trail2 = bTrail.get(i);
@@ -465,7 +518,6 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box2.noMove();
 			p2wins = true;
 			powerTaken = -1;
-			System.out.printf("p2: %d\n",p2points);
 			roundOver = true;
 		}
 
@@ -474,24 +526,35 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 			box1.noMove();
 			box2.noMove();
 			p1wins = true;
-			System.out.printf("p1: %d\n",p1points);
-			System.out.println(p1wins);
-			System.out.println(p2wins);
 			powerTaken = -1;
 			roundOver = true;
 		}
 		
 		
-		if(p1points < 3 && pointAdded == false && p1wins){
+		if(p1points < 3 && pointAdded == false && p1wins){ //if player 1 should get a point
 			p1points += 1;
 			p1wins = false;
 			pointAdded = true;
 			}
 			
-		if(p2points < 3 && pointAdded == false && p2wins){
+		if(p2points < 3 && pointAdded == false && p2wins){ //if player 2 should get a point
 			p2points += 1;
 			p2wins = false;
 			pointAdded = true;
+			}
+		
+		if(p1points == 3){ //if player 1 wins the match
+			setVisible(false);
+			//game.between();
+			p1points = 0; 
+			p2points = 0;
+			}
+		
+		if(p2points == 3){ //if player 2 wins the match
+			setVisible(false);
+			//game.between();
+			p1points = 0;
+			p2points = 0;
 			}
 			
 		//Power Up Timer
@@ -831,7 +894,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		System.out.println("New Round");
 		box1 = new Spot(250,470);
 		box2 = new Spot(605,470);
-
+		
 		//System.out.println("P1 Wins: "+box1.countRoundWins());
 		//System.out.println("P2 Wins: "+box2.countRoundWins());
 
