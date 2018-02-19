@@ -20,14 +20,15 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 		super("Tron"); //calls constructor of super frame, must be first line of constructor
 		setSize(855,800);
 		myTimer = new Timer(40,this);
-		myTimer.start();
+		//myTimer.start();
 		game = new GamePanel();
 		add(game);
 
 		setResizable(false);
-		setVisible(true);
+		//setVisible(true);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		new GameMenu(this);
 	}
 
 	public void actionPerformed(ActionEvent e){
@@ -45,11 +46,60 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 			game.repaint();
 		}
 	}
-
+	
+	public void start(){
+		myTimer.start();
+		setVisible(true);
+		}
 	public static void main(String[]args){
 		new simpleGame();
 	}
 }
+
+class GameMenu extends JFrame implements ActionListener{
+	private simpleGame sg;
+	
+	JButton oPlayBtn = new JButton("one player");
+	JButton tPlayBtn = new JButton("two players");
+	
+	public GameMenu(simpleGame m){
+		super("game menu");
+		setSize(850,800);
+		sg = m;
+		oPlayBtn.addActionListener(this);
+		tPlayBtn.addActionListener(this);
+		
+		ImageIcon back = new ImageIcon("images/menu.png");
+		JLabel backLabel = new JLabel(back);
+		JLayeredPane mPage=new JLayeredPane(); 	// LayeredPane allows my to control what shows on top
+		mPage.setLayout(null);
+		
+		backLabel.setSize(855,800);
+		backLabel.setLocation(0,0);
+		mPage.add(backLabel,1);					// The numbers I use when adding to the LayeredPane
+												// are just relative to one another. Higher numbers on top.
+		oPlayBtn.setSize(100,30);
+		ImageIcon btnOne = new ImageIcon("images/btnOne.png");
+ 		oPlayBtn.setIcon(btnOne);
+		oPlayBtn.setLocation(200,700);
+		mPage.add(oPlayBtn,2);
+		
+		tPlayBtn.setSize(100,30);
+		ImageIcon btnTwo = new ImageIcon("images/btnTwo.png");
+ 		tPlayBtn.setIcon(btnTwo);
+		tPlayBtn.setLocation(550,700);
+		mPage.add(tPlayBtn,2);
+		
+		add(mPage);
+		setVisible(true);
+		}
+		
+	public void actionPerformed(ActionEvent evt) {
+    	sg.start();
+    	setVisible(false);
+    	}
+	}
+
 
 class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
 	private boolean [] keys;
@@ -70,13 +120,13 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private int randPowerUp;
 
 	/*RAND POWERS
-	0 - extra turbo
-	1 - portal
-	2 - double speed
-	3 - shield
-	4 - reverse opp. controls
-	5 - clear trails
-	6 - turbo
+	0 - extra turbo (yellow)
+	1 - portal (cyan)
+	2 - double speed (magenta)
+	3 - shield (white)
+	4 - reverse opp. controls (orange)
+	5 - clear trails (green)
+	6 - turbo 
 
 	POWERTAKEN
 	0 - None
@@ -246,7 +296,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		g.drawRect((int)rect1.getX(),(int)rect1.getY(),(int)rect1.getWidth(),(int)rect1.getHeight());
 
 		g.setColor(new Color(0,255,255));
-		//g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
+		g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
 
 		//Power Ups
 		if(objectOnScreen == true && powerTaken == 0){ //if on screen
@@ -316,7 +366,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//System.out.println(box1.returnX());
 
-		box1.noMove();
+		//box1.noMove();
 
 		/*if(box1.turboInitiated()){
 			box1.turbo();
