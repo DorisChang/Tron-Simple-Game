@@ -139,10 +139,11 @@ class GamePanel extends JPanel implements KeyListener{
 	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
 	private boolean pointAdded; //boolean to keep prevent more than one point from being rewarded for the same action
 
-	private Rectangle p;
+	//=======Power Ups======
+	private Rectangle p; //power up rectangle
 	private int px = 0, py = 0;
-	private int onScreenLifeTime = 500;
-	private int blitNewObject = 10;
+	private int onScreenLifeTime = 200;
+	private int blitNewObject = 350;
 	private int timeLeft = 140;
 	private int turboTime1 = 5, turboTime2 = 5;
 	private boolean objectOnScreen, blitted, roundOver, pressedSpace;
@@ -157,13 +158,12 @@ class GamePanel extends JPanel implements KeyListener{
 	private String[] messages2 = {"That was close!","  Close one!"," Super close!"}; //selection of messages for the end of a tight round
 
 	/*RAND POWERS
-	0 - extra turbo
-	1 - portal
-	2 - double speed
-	3 - shield
+	0 - extra turbo (gains one turbo)
+	1 - portal (allows you to travel from one side of the playing field to the other (side walls don't affect you)
+	2 - double speed (doubles the speed of the opponent)
+	3 - shield (protects you from the wall BUILT; borders still hurt)
 	4 - reverse opp. controls
 	5 - clear trails
-	6 - turbo
 
 	POWERTAKEN
 	0 - None
@@ -234,8 +234,8 @@ class GamePanel extends JPanel implements KeyListener{
 					}
 			
 			//Power Up Timer
-			g.fillRect(108,30,10,75);
-			g.fillRect(741,30,10,75);
+			//g.fillRect(108,30,10,75);
+			//g.fillRect(741,30,10,75);
 	
 			//=====Rounds Won Bar====
 			//Number Square
@@ -243,52 +243,35 @@ class GamePanel extends JPanel implements KeyListener{
 			g.setFont(new Font("Calibri",Font.PLAIN,32));
 			g.drawString(""+p1points, 253,72);
 			g.drawString(""+p2points, 588,72);
-			//g.setColor(new Color(17,122,72));
 	
 			//========Trails========
 			ArrayList<Rectangle>aTrail = box1.returnTrail();
 			g.setColor(new Color(65,227,204));
 	
-			//Player 1 Trail
+			//PLAYER 1
+			//trail
 			for(int i = 0; i < aTrail.size(); i++){
 				Rectangle trail = aTrail.get(i);
 				g.fillRect((int)trail.getX(),(int)trail.getY(),(int)trail.getWidth(),(int)trail.getHeight());
 			}
 	
-			//turbo left
+			//# of turbo left (squares)
 			for(int i = 0; i < box1.countTurboLeft(); i++){
 				g.fillRect(149+29*i,83,16,16);
 			}
 	
-			//p1 win bar
+			//# of wins (bar)
 			for(int i = 0; i < p1points; i++){
 				g.fillRect(297+39*i,56,37,3);
 			}
-	
-			//time left
-			//g.setColor(new Color(100,0,0));
-			//g.fillRect(110,30,6,70);
-	
-			//time gone
-			//g.setColor(Color.red);
+
+			//time remaining for power up (bar)
 			if(powerTaken == 1){
 				g.fillRect(110,32+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
-				//System.out.println(timeLeft);
 			}
-			
-		
-			//turbo counters
-			//g.setColor(new Color(100,0,0));
-			//for(int i = 3 - box1.countTurboLeft(); i > 0; i--){
-				//g.fillRect(215-25*i,70,20,20);
-			//}
 	
-			//empty win counter
-			//for(int i = 3-p1points; i > 0; i--){
-				//g.fillRect(414-39*i,56,37,3);
-			//}
-	
-			//Player 2 Trail
+			//PLAYER 2 
+			//trail
 			ArrayList<Rectangle>bTrail = box2.returnTrail();
 			g.setColor(new Color(130,101,182));
 	
@@ -297,41 +280,23 @@ class GamePanel extends JPanel implements KeyListener{
 				g.fillRect((int)trail2.getX(),(int)trail2.getY(),(int)trail2.getWidth(),(int)trail2.getHeight());
 			}
 	
-			//turbo left
+			//# of turbo left (squares)
 			for(int i = 0; i < box2.countTurboLeft(); i++){
 				g.fillRect(642+29*i,83,16,16);
 			}
 	
-			//p2 wins bar
+			//# of wins (bar)
 			for(int i = 0; i < p2points; i++){
 				g.fillRect(441+39*i,56,37,3);
 			}
 	
-			//time gone
-			//g.setColor(new Color(0,0,100));
-			//g.fillRect(743,30,6,70);
-	
-			//time left
-			//g.setColor(Color.blue);
+			//time remaining for power up (bar)
 			if(powerTaken == 2){
 				g.fillRect(743,32+(140-timeLeft)/2,6,70-(140-timeLeft)/2);
 				//System.out.println(timeLeft);
 			}
-			
-			
-			
-			//empty turbo counter
-			//g.setColor(new Color(0,0,100));
-			//for(int i = 3 - box2.countTurboLeft(); i > 0; i--){
-				//g.fillRect(730-25*i,70,20,20);
-			//}
 	
-			//empty win bar
-			//for(int i = 3-p2points; i > 0; i--){
-				//g.fillRect(558-39*i,56,37,3);
-			//}
-	
-			//Players (Ovals)
+			//Players (Circle - Ring)
 			g.setColor(new Color(200,200,200));
 			g.fillOval(box1.returnX()-1,box1.returnY()-1,6,6);
 			g.fillOval(box2.returnX()-1,box2.returnY()-1,6,6);
@@ -341,68 +306,55 @@ class GamePanel extends JPanel implements KeyListener{
 	
 			g.setColor(new Color(110,98,150));
 			g.fillOval(box2.returnX(),box2.returnY(),4,4);
-	
-			//Colliding Rectangles (Testing Only - Delete afterwards)
-			Rectangle rect1 = box1.drawR();
-			Rectangle rect2 = box2.drawR();
-	
-			g.setColor(new Color(255,255,0));
-			g.drawRect((int)rect1.getX(),(int)rect1.getY(),(int)rect1.getWidth(),(int)rect1.getHeight());
-	
-			g.setColor(new Color(0,255,255));
-			g.drawRect((int)rect2.getX(),(int)rect2.getY(),(int)rect2.getWidth(),(int)rect2.getHeight());
 			
-
-			
-			//Power Ups
+			//========Power Ups========
 			if(objectOnScreen == true && powerTaken == 0){ //if on screen
-				if(blitted == false){ //choose random powerup
-					randPowerUp = randomPowerUp();
+				//choose random power up
+				if(blitted == false){ 
+					randPowerUp = randomPowerUp(); 
 	
 					Random rand = new Random();
 	
-					px = rand.nextInt(720);
-					py = rand.nextInt(590);
+					px = rand.nextInt(720); //random x-coord
+					py = rand.nextInt(590); //random y-coord
 	
 					p.setLocation(px+60,py+110);
 	
 					blitted = true;
 				}
 	
+				//set color depending on what power up
 				if(randPowerUp == 0){
-					//System.out.println("Extra Turbo");
+					//Extra Turbo
 					g.setColor(new Color(255,255,0));
 				}
 	
 				if(randPowerUp == 1){
-					//System.out.println("Turbo");
+					//Turbo
 					g.setColor(new Color(0,255,255));
 				}
 	
 				if(randPowerUp == 2){
-					//System.out.println("Double Speed");
+					//Double Speed
 					g.setColor(new Color(255,0,255));
 				}
 	
 				if(randPowerUp == 3){
-					//System.out.println("Shield");
+					//Shield
 					g.setColor(new Color(255,255,255));
 				}
 	
 				if(randPowerUp == 4){
+					//Reverse Controls
 					g.setColor(new Color(255,140,0));
 				}
 	
 				if(randPowerUp == 5){
+					//Clear
 					g.setColor(new Color(0,255,0));
 				}
 	
 				g.fillRect(px+60,py+110,10,10);
-	
-				g.setColor(new Color(189,255,0));
-				g.drawRect((int)p.getX(),(int)p.getY(),(int)p.getWidth(),(int)p.getHeight());
-				
-				
 			}
 			
 			if(roundOver){ //changes the text at the bottom of the screen (tells players to press space to continue)
@@ -420,23 +372,8 @@ class GamePanel extends JPanel implements KeyListener{
 		box1.move();
 		box2.move();
 
-
-		//System.out.println(box1.returnX());
-
-		//box1.noMove();
-
-		/*if(box1.turboInitiated()){
-			box1.turbo();
-			box1.noTurbo();
-
-			System.out.println("Turbo Time");
-
-			turboTime = 3;
-			powerTaken = 3;
-		}*/
-
+		//===Getting Power Ups===
 		if(box1.getPowerUp(p)){
-			//System.out.println("I got it!");
 			usingPowerNum = randPowerUp; //updates to the power up that has been obtained
 			
 			if(randPowerUp != 2 && randPowerUp != 4){
@@ -453,12 +390,9 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 
 		if(box2.getPowerUp(p)){
-			//System.out.println("I got it!");
 			usingPowerNum = randPowerUp; //updates to the power up that has been obtained
 			
 			if(randPowerUp != 2 && randPowerUp != 4){
-				//box2.noMove();
-				//box1.move();
 				powerTaken = 2;
 				objectOnScreen = false;
 				timeLeft = 140;
@@ -471,21 +405,11 @@ class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 
-		/*else if(box2.getPowerUp(p)){
-			timeLeft = 700;
-			onScreenLifeTime = 0;
-			powerTaken = 2;
-			powerCountDown(box2);
-		}*/
-
-		//returnRect - give players collision rectangle
-
 		//=============Checking for Collisions==============
 		boolean player1Dead = box1.checkCollisions(box2.returnTrail());
 		boolean player2Dead = box2.checkCollisions(box1.returnTrail());
 
 		if(player1Dead && player2Dead){
-			//System.out.println("hi");
 			box1.noMove();
 			box2.noMove();
 
@@ -494,7 +418,6 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 
 		else if(player1Dead){
-			//System.out.println("Player 2 wins");
 			box1.noMove();
 			box2.noMove();
 			p2wins = true;
@@ -503,7 +426,6 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 
 		else if(player2Dead){
-			//System.out.println("Player 1 wins");
 			box1.noMove();
 			box2.noMove();
 			p1wins = true;
@@ -529,11 +451,6 @@ class GamePanel extends JPanel implements KeyListener{
 				p2matches += 1;
 			}
 		}
-		
-	
-
-		//System.out.println(box1.controlsReversed());
-		//System.out.println(box2.controlsReversed());
 			
 		//Power Up Timer
 		tick();
@@ -542,40 +459,29 @@ class GamePanel extends JPanel implements KeyListener{
 	//==================Power Ups====================
 	//blitting random power ups
 	public void tick(){
-		if(powerTaken == 0){
+		if(powerTaken == 0){ //if no one has yet to grab a power up
+			//Turbo
 			if(box1.turboSpeed()){
 				turboTime1 -= 1;
 
-				//System.out.println(turboTime2);
-
 				if(turboTime1 == 0){
-					//box1.turboSpeed();
 					box1.stopTurbo();
-					//turboTime1 = 5;
-					//powerTaken = 0;
 				}
 			}
 
 			if(box2.turboSpeed()){
 				turboTime2 -= 1;
 
-				
-
 				if(turboTime2 == 0){
 					box2.stopTurbo();
-					//turboTime2 = 5;
-					//powerTaken = 0;
-
-					//System.out.println(turboTime2);
 				}
 			}
 
 			if(objectOnScreen == false){ //if the object is not on screen
-				//System.out.println(blitNewObject);
 				blitNewObject -= 1;
 
 				if(blitNewObject == 0){
-					onScreenLifeTime = 500;
+					onScreenLifeTime = 200;
 					objectOnScreen = true;
 					blitted = false;
 				}
@@ -583,7 +489,7 @@ class GamePanel extends JPanel implements KeyListener{
 
 			else if(objectOnScreen == true){ //if on screen
 				if(onScreenLifeTime == 0 && powerTaken == 0){
-					blitNewObject = 10;
+					blitNewObject = 300;
 					objectOnScreen = false;
 				}
 
@@ -594,6 +500,7 @@ class GamePanel extends JPanel implements KeyListener{
 			}
 		}	
 
+		//Power up (not Turbo)
 		if(powerTaken != 0 && (box1.turboSpeed() == false || box2.turboSpeed() == false)){
 			onScreenLifeTime = 0;
 			blitNewObject = 0;
@@ -610,7 +517,7 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 
-	public int randomPowerUp(){
+	public int randomPowerUp(){ //choosing a random power up
 		Random rand = new Random();
 
 		int r = rand.nextInt(6);
@@ -618,40 +525,31 @@ class GamePanel extends JPanel implements KeyListener{
 		return r;
 	}
 
+	//Power Ups
 	public void powerCountDown(Spot player, Spot otherPlayer){
 		if(timeLeft > 0){
-			//System.out.println(timeLeft);
 			if(randPowerUp == 0){
-				//System.out.println("Extra Turbo");
 				player.extraTurbo();
 				timeLeft = 0;
 			}
 
 			else if(randPowerUp == 1){
-				//System.out.println("Portal");
 				player.openPortal();
 			}
 
 			else if(randPowerUp == 2){
-				//System.out.println("Double Speed");
 				player.doubleSpeed();
 			}
 
 			else if(randPowerUp == 3){
-				//System.out.println("Shield");
 				player.shieldUp();
 			}
 
 			else if(randPowerUp == 4){
-				//System.out.println("Reverse");
-				//otherPlayer.move();
 				player.reverseControls();
-				//player.noMove();
-				//otherPlayer.doubleSpeed();
 			}
 
 			else if(randPowerUp == 5){
-				//System.out.println("Clear");
 				player.emptyTrail();
 				otherPlayer.emptyTrail();
 
@@ -661,11 +559,10 @@ class GamePanel extends JPanel implements KeyListener{
 			timeLeft -= 1;
 		}
 
-		else if(timeLeft <= 0){
-			System.out.println("Time's Up");
+		else if(timeLeft <= 0){ //time's up
 			usingPowerNum = 100; 
 			powerTaken = 0;
-			blitNewObject = 10;
+			blitNewObject = 300;
 
 			if(randPowerUp == 1){
 				player.closePortal();
@@ -676,7 +573,6 @@ class GamePanel extends JPanel implements KeyListener{
 			}
 
 			else if(randPowerUp == 3){
-				//System.out.println("Shield Down");
 				player.shieldDown();
 			}
 
@@ -700,41 +596,25 @@ class GamePanel extends JPanel implements KeyListener{
 
 	public void pMove(){
 		if(roundOver == false){
-			/*if(box1.returnX() == px+50 && box1.returnY() == py+210){
-				box1.warpWall();
-				lifeTime = 0;
-			}*/
-
 			//enter for turbo >> P1
 			if(keys[KeyEvent.VK_ENTER]){
 				if(box2.countTurboLeft() > 0){
-					//box1.turboSpeed();
-
 					box2.turbo();
-					//System.out.println(roundOver);
-					//box1.noTurbo();
 
 					turboTime2 = 5;
-					//powerTaken = 2;
-
-
 				}	
 			}
 
 			//tab for turbo >> p2
 			if(keys[KeyEvent.VK_Q]){
-				//System.out.println("HELLO");
 				if(box1.countTurboLeft() > 0){
-					//box1.turboSpeed();
-
 					box1.turbo();
-					//box1.noTurbo();
 
 					turboTime1 = 5;
-					//powerTaken = 1;
 				}
 			}
 
+			//Normal Controls
 			if(box2.controlsReversed() == false){
 				if(keys[KeyEvent.VK_RIGHT]){
 					if(box2.moveD() != "left"){
@@ -785,6 +665,7 @@ class GamePanel extends JPanel implements KeyListener{
 				}
 			}
 
+			//Reversed Controls
 			if(box1.controlsReversed() == false){
 				if(keys[KeyEvent.VK_D]){
 					if(box1.moveD() != "left"){
@@ -833,7 +714,6 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 
 		else{
-			//System.out.println("NEXT");
 			if(keys[KeyEvent.VK_SPACE]){
 				pressedSpace = true;
 				if(p1points == 3){
@@ -855,74 +735,24 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 
-	/*public void cMove(){ //computer moves
-		if(box2.getHit() == false && box1.getHit() == false){
-			Random rand = new Random();
-
-			int r = rand.nextInt(4);
-
-			if(r == 0){
-				if(box2.moveD() != "left"){
-					box2.moveRight();
-				}
-			}
-			else if(r == 1){
-				if(box2.moveD() != "right"){
-					box2.moveLeft();
-				}
-			}
-			else if(r == 2){
-				if(box2.moveD() != "down"){
-					box2.moveUp();
-				}
-			}
-			else if(r == 3){
-				if(box2.moveD() != "up"){
-					box2.moveDown();
-				}
-			}
-		}
-
-		else{
-			box2.noMove();
-		}
-	}*/
-
 	public void nextRound(){
-		System.out.println("New Round");
+		//initial location and direction
 		box1 = new Spot(250,470);
 		box2 = new Spot(605,470);
-		
-		//System.out.println("P1 Wins: "+box1.countRoundWins());
-		//System.out.println("P2 Wins: "+box2.countRoundWins());
 
 		box1.moveRight();
 		box2.moveLeft();
 
 		objectOnScreen = false;
 		blitted = true;
-		//pointAdded = true;
 		pointAdded = false;
 		powerTaken = 0;
+		usingPowerNum = 100;
 		randPowerUp = 0;
-		blitNewObject = 10;
+		blitNewObject = 300;
 		onScreenLifeTime = 0;
 		roundOver = false;
 		pressedSpace = false;
-
-		/*if(box1.countRoundWins() == 3){
-			box1.winBattle();
-			endBattle(box1,box2);
-		}
-
-		else if(box2.countRoundWins() == 3){
-			box2.winBattle();
-			endBattle(box2,box1);
-		}*/
-	}
-
-	public void endBattle(Spot winner, Spot loser){
-		System.out.println("END OF BATTLE");
 	}
 }
 
