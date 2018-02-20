@@ -2,8 +2,7 @@
 //Minya Bai & Doris Chang
 //Tron LightCycles
 //This game allows you to control a little cycle that builds a wall after itself. The object of the 
-//game is to maneuver your opponent so that they run into a wall/your path/their own path
-//before you do.
+//game is to maneuver your opponent so that they run into a wall before you do.
 
 import java.util.Random;
 import java.util.ArrayList;
