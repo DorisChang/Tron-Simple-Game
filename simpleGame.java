@@ -1,6 +1,9 @@
-//Game3.java
-
-//HOT DIGGITY DOG!
+//simpleGame.java
+//Minya Bai & Doris Chang
+//Tron LightCycles
+//This game allows you to control a little cycle that builds a wall after itself. The object of the 
+//game is to maneuver your opponent so that they run into a wall/your path/their own path
+//before you do.
 
 import java.util.Random;
 import java.util.ArrayList;
@@ -9,24 +12,20 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.awt.image.*;
 
-public class simpleGame extends JFrame implements ActionListener{ //inherits from JFrame, JFrame and More :O
-	//ACtionLIstner is a interface. Bargain- we provide the methods it wants, and it will do stuff when needed
+public class simpleGame extends JFrame implements ActionListener{
+	
 	Timer myTimer;
 	Timer powerUpTimer;
 	GamePanel game;
 
-	
 	public simpleGame(){
-		super("Tron"); //calls constructor of super frame, must be first line of constructor
+		super("Tron"); 
 		setSize(855,800);
 		myTimer = new Timer(40,this);
-		//myTimer.start();
 		game = new GamePanel();
 		add(game);
 
 		setResizable(false);
-		//setVisible(true);
-
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		new GameMenu(this);
 	}
@@ -34,35 +33,17 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 	public void actionPerformed(ActionEvent e){
 		if(game != null){
 			game.twoPlayer();
-			//game.onePlayer();
-
-			//if sp >> only 1 P
-			//game.pOneMove();
-
-			//if tp >> have both
-			//game.pOneMove();
-			//game.pTwoMove();
-
 			game.repaint();
 		}
 	}
 	
-	public void instructions(){
+	public void instructions(){ //used for the instructions screen 
 		new InstructMenu(this);
 		}
-		
-	public void between(){
-		new BtwMenu(this);
-		}
 	
-	public void start(){
+	public void start(){ //used to start the game
  		myTimer.start();
  		setVisible(true);
- 		}
- 		
- 	public void stop(){
- 		myTimer.stop();
- 		setVisible(false);
  		}
 
 	public static void main(String[]args){
@@ -70,16 +51,16 @@ public class simpleGame extends JFrame implements ActionListener{ //inherits fro
 	}
 }
 
-class GameMenu extends JFrame implements KeyListener{
- 	private simpleGame sg; 
+class GameMenu extends JFrame implements KeyListener{ //JFrame for the game/main menu, uses SPACE to continue 
+ 	private simpleGame menu; 
  	private boolean [] keys;
  	
  	public GameMenu(simpleGame m){
  		super("game menu");
  		setSize(850,800);
- 		sg = m;
+ 		menu = m;
  		
- 		ImageIcon back = new ImageIcon("images/titleScreen.png");
+ 		ImageIcon back = new ImageIcon("images/titleScreen.png"); 
  		JLabel backLabel = new JLabel(back);
  		JLayeredPane mPage=new JLayeredPane(); 	
  		mPage.setLayout(null);
@@ -97,9 +78,8 @@ class GameMenu extends JFrame implements KeyListener{
     public void keyPressed(KeyEvent e){
 		keys[e.getKeyCode()] = true;
 			
-		if(keys[KeyEvent.VK_SPACE]){
-			//sg.start();
-			sg.instructions();
+		if(keys[KeyEvent.VK_SPACE]){ //when SPACE is pressed
+			menu.instructions(); //show the instructions 
 			setVisible(false);	
 			}
 
@@ -110,7 +90,7 @@ class GameMenu extends JFrame implements KeyListener{
 		}
  	}
  	
-class InstructMenu extends JFrame implements KeyListener{
+class InstructMenu extends JFrame implements KeyListener{ //the instructions menu, uses SPACE to continue
 	private simpleGame bg;
  	private boolean [] keys;
  	
@@ -137,8 +117,8 @@ class InstructMenu extends JFrame implements KeyListener{
  	public void keyPressed(KeyEvent e){
 		keys[e.getKeyCode()] = true;
 			
-		if(keys[KeyEvent.VK_SPACE]){
-			bg.start();
+		if(keys[KeyEvent.VK_SPACE]){ //when SPACE is pressed
+			bg.start(); //starts the game
 			setVisible(false);	
 			}
 		}
@@ -150,13 +130,13 @@ class InstructMenu extends JFrame implements KeyListener{
 	}
 
 
-class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interface
+class GamePanel extends JPanel implements KeyListener{  
 	private boolean [] keys;
 	private Spot box1;
 	private Spot box2;
 	private Image back, btw, rOver;
 
-	private int p1points, p2points, p1matches, p2matches; //points from 0-3 during each match (3 ends the game)
+	private int p1points, p2points, p1matches, p2matches; //points from 0-3 during each match (3 ends the game), the number of matches won
 	private boolean p1wins = false, p2wins = false; //boolean for keeping track of whether the player should get a point
 	private boolean pointAdded; //boolean to keep prevent more than one point from being rewarded for the same action
 
@@ -169,13 +149,13 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	private boolean objectOnScreen, blitted, roundOver, pressedSpace;
 	private int powerTaken; //0 for not taken, 1 for player 1, 2 for player 2
 	private int randPowerUp; 
-	private int messageNum = 100; //index for the message at the end of a round
-	private String message; //the message at the end of a round
-	private int usingPowerNum = 100; //index for the power up being used
+	private int messageNum = 100; //index for the message displayed at the end of a round (100 when no new random number for messageNum has be generated)
+	private String message; //the actual message displayed at the end of a round, determined randomly
+	private int usingPowerNum = 100; //index for the power up being used (100 when not applicable)
 	
-	private String[] powerUps = {"   Extra Turbo","        Portal","      2X Speed","        Shield","Reverse Controls","Clear All Trails"};
-	private String[] messages1 = {"Total Wipeout!","    Easy win!", "No competition!"};
-	private String[] messages2 = {"That was close!","  Close one!"," Super close!"};
+	private String[] powerUps = {"   Extra Turbo","        Portal","      2X Speed","        Shield","Reverse Controls","Clear All Trails"}; //titles displayed when a player obtains a power up
+	private String[] messages1 = {"    Easy win!", "No competition!"}; //selection of messages for the end of a round
+	private String[] messages2 = {"That was close!","  Close one!"," Super close!"}; //selection of messages for the end of a tight round
 
 	/*RAND POWERS
 	0 - extra turbo
@@ -195,9 +175,9 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	//==============Constructor=============
 	public GamePanel(){
 		nextRound();
-		back = new ImageIcon("images/GameScreen.png").getImage();
-		btw = new ImageIcon("images/EndMatch.png").getImage();
-		rOver = new ImageIcon("images/EndRoundSlip.png").getImage();
+		back = new ImageIcon("images/GameScreen.png").getImage(); //background of the game when playing
+		btw = new ImageIcon("images/EndMatch.png").getImage(); //the end of a match screen used in between matches, shows the point score for that match and the match score
+		rOver = new ImageIcon("images/EndRoundSlip.png").getImage(); //image used to tell players to press enter to continue the round
 		p = new Rectangle(0,0,10,10);
 		
 		p1matches = 0;
@@ -211,67 +191,49 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		requestFocus();
 
 		keys = new boolean[KeyEvent.KEY_LAST+1];
-		
-		
 	}
 
 	//==============Drawing Stuff==============
-	@Override //think I am overriding one of the methods in JPanel
-	public void paintComponent(Graphics g){ //supply same parameters that replaces it
+	@Override 
+	public void paintComponent(Graphics g){ 
 			
 		if(p1points == 3 || p2points == 3){ //if someone wins the match
-			g.drawImage(btw,0,0,this);
+			g.drawImage(btw,0,0,this); 
 			g.setColor(new Color(250,250,250));
 			g.setFont(new Font("Calibri",Font.PLAIN,32));
-			g.drawString(""+p1matches, 360,630);
+			
+			g.drawString(""+p1matches, 360,630); //displays the match score
 			g.drawString("-",420,630);
 			g.drawString(""+p2matches, 480,630);
 			
-			Random rand = new Random();
-			if(Math.abs(p1points - p2points) > 1 && messageNum == 100){
+			Random rand = new Random(); //randomly chooses the message for the match
+			if(Math.abs(p1points - p2points) > 1 && messageNum == 100){ //when the scores were not close
 				messageNum = rand.nextInt(messages1.length);
 				message = messages1[messageNum];
 				}
 				
-			else if(Math.abs(p1points - p2points) == 1 && messageNum == 100){
+			else if(Math.abs(p1points - p2points) == 1 && messageNum == 100){ //when it was a tight match
 				messageNum = rand.nextInt(messages2.length);
 				message = messages2[messageNum];
 				}
-			
-			g.drawString(""+p1points,360,330);
-			g.drawString("-",420,330);
-			g.drawString(""+p2points,480,330);
+				
 			g.drawString(message,340,400);
 			
-			
+			g.drawString(""+p1points,360,330); //displays the score of the match that just ended
+			g.drawString("-",420,330);
+			g.drawString(""+p2points,480,330);
 			}
 
 		
-		else{
+		else{ //during the game
 			g.drawImage(back,0,0,this);
 			
-			if(usingPowerNum != 100){
+			if(usingPowerNum != 100){ //when a power up is being used
 				g.setColor(new Color(250,250,250));
 				g.setFont(new Font("Calibri",Font.PLAIN,24));
-				g.drawString(powerUps[usingPowerNum], 353,95);
-				
-				
+				g.drawString(powerUps[usingPowerNum], 353,95); //displays the power up title on the top
 					}
 			
-			//Board
-			//g.setColor(new Color(125,125,125));
-			//g.fillRect(60,110,730,635);
-	
-			//Player Cards
-			//g.setColor(new Color(200,200,200));
-	
-			//Turbo Bar
-			//g.fillRect(135,65,80,30); OLD
-			//g.fillRect(650,65,80,30); OLD
-			
-			//g.fillRect(146,81,80,20);
-			//g.fillRect(640,81,80,20);
-	
 			//Power Up Timer
 			g.fillRect(108,30,10,75);
 			g.fillRect(741,30,10,75);
@@ -301,7 +263,6 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 	
 			//p1 win bar
 			for(int i = 0; i < p1points; i++){
-				//System.out.println(p1points);
 				g.fillRect(297+39*i,56,37,3);
 			}
 	
@@ -453,15 +414,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		
 	}
 
-	//===================Moving Players===================
-	/*public void onePlayer(){
-		pMove();
-		cMove();
-
-		box1.move();
-		box2.move();
-	}*/
-
+	//===================Moving Players==================
 	public void twoPlayer(){
 		pMove();
 		
@@ -471,7 +424,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		//System.out.println(box1.returnX());
 
-		box1.noMove();
+		//box1.noMove();
 
 		/*if(box1.turboInitiated()){
 			box1.turbo();
@@ -485,7 +438,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		if(box1.getPowerUp(p)){
 			//System.out.println("I got it!");
-			usingPowerNum = randPowerUp;
+			usingPowerNum = randPowerUp; //updates to the power up that has been obtained
 			
 			if(randPowerUp != 2 && randPowerUp != 4){
 				powerTaken = 1;
@@ -502,7 +455,7 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 
 		if(box2.getPowerUp(p)){
 			//System.out.println("I got it!");
-			usingPowerNum = randPowerUp;
+			usingPowerNum = randPowerUp; //updates to the power up that has been obtained
 			
 			if(randPowerUp != 2 && randPowerUp != 4){
 				//box2.noMove();
@@ -560,39 +513,25 @@ class GamePanel extends JPanel implements KeyListener{ //Keyboard is an interfac
 		}
 		
 		
-		if(p1points < 3 && pointAdded == false && p1wins){ //if player 1 should get a point
+		if(p1points < 3 && pointAdded == false && p1wins){ //if player 1 should get a point (has not yet won the round and the point hasn't been added already)
 			p1points += 1;
-			p1wins = false;
+			p1wins = false; 
 			pointAdded = true;
-			if(p1points == 3){
+			if(p1points == 3){ //if p1 wins the match after the added point
 				p1matches += 1;
 			}
 		}
 			
-		if(p2points < 3 && pointAdded == false && p2wins){ //if player 2 should get a point
+		if(p2points < 3 && pointAdded == false && p2wins){ //if player 2 should get a point (has not yet won the round and the point hasn't been added already)
 			p2points += 1;
 			p2wins = false;
 			pointAdded = true;
-			if(p2points == 3){
+			if(p2points == 3){ //if p2 wins the match after the added point
 				p2matches += 1;
 			}
 		}
 		
-		/*if(p1points == 3){ //if player 1 wins the match
-			//setVisible(false);
 	
-			p1points = 0; 
-			p2points = 0;
-			//pressedSpace = false;
-			}
-		
-		if(p2points == 3){ //if player 2 wins the match
-			//setVisible(false);
-	
-			p1points = 0;
-			p2points = 0;
-			//pressedSpace = false;
-			}*/
 
 		//System.out.println(box1.controlsReversed());
 		//System.out.println(box2.controlsReversed());
