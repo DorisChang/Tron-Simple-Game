@@ -11,7 +11,7 @@ public class Spot{
 	private int cx, cy; //current coordinates
 	private int sx, sy; //coordinates at where the player changes directions
 	private int w, h; //width and height of the rectangle
-	private int roundWins, battleWins; //round points, battle wins
+	//private int roundWins, battleWins; //round points, battle wins
 	private int xChange, yChange; //how much the x,y are changing for player
 	private int deltaX, deltaY; //direction (either 0 or 1)
 	private String direction; //direction the player is moving
@@ -32,8 +32,8 @@ public class Spot{
 		hit = false;
 		pressTurbo = false;
 
-		roundWins = 0;
-		battleWins = 0;
+		//roundWins = 0;
+		//battleWins = 0;
 
 		turboLeft = 3;
 
@@ -228,13 +228,34 @@ public class Spot{
 
 		else{
 			//System.out.println("Merpppp");
-			if(cx <= 60 || cx >= 785){
-				//System.out.println("HellO");
+			if(cx <= 60){
+				sx = cx;
+				cx = 60;
+
 				hit = true;
 				return true;
 			}
 
-			else if(cy <= 110 || cy >= 705){
+			else if(cx >= 785){
+				rect.setBounds(sx,sy,(785-sx)+5,height()+5);
+				cx = 785;
+
+				hit = true;
+				return true;
+			}
+
+			else if(cy <= 110){
+				sy = cy;
+				cy = 110;
+
+				hit = true;
+				return true;
+			}
+
+			else if(cy >= 705){
+				rect.setBounds(sx,sy,width()+5,(705-sy)+5);
+				cy = 705;
+
 				hit = true;
 				return true;
 			}
