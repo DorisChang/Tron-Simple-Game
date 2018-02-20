@@ -344,6 +344,7 @@ public class Spot{
 	}*/
 
 	public void extraTurbo(){
+		System.out.println(turboLeft);
 		if(turboLeft == 3){
 			turboLeft = 3;
 		}
@@ -352,6 +353,7 @@ public class Spot{
 			System.out.println("Merp");
 			turboLeft += 1;
 		}
+		System.out.println(turboLeft);
 	}
 
 	public int countTurboLeft(){
